@@ -1,3 +1,4 @@
+import RecipeCard from "./components/RecipeCard"
 import RecipeTitle from "./components/RecipePage"
 
 function App() {
@@ -47,6 +48,14 @@ function App() {
          ]}
        />
     </>
+
+    /*
+    <>
+      <RecipeCard></RecipeCard><br />
+      <RecipeCard></RecipeCard><br />
+      <RecipeCard></RecipeCard><br />
+    </>
+    */
   )
 }
 

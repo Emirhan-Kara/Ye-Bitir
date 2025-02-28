@@ -1,4 +1,4 @@
-import RecipeTitle from "./components/RecipeTitle"
+import RecipeTitle from "./components/RecipePage"
 
 function App() {
   return (

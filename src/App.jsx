@@ -3,6 +3,7 @@ import RecipeTitle from "./components/RecipePage"
 
 function App() {
   return (
+    
     <>
        <RecipeTitle 
          title="Cucumber Lemon Pepper Mustard"
@@ -48,12 +49,12 @@ function App() {
          ]}
        />
     </>
-
+    
     /*
     <>
-      <RecipeCard></RecipeCard><br />
-      <RecipeCard></RecipeCard><br />
-      <RecipeCard></RecipeCard><br />
+      <RecipeCard></RecipeCard>
+      <RecipeCard></RecipeCard>
+      <RecipeCard></RecipeCard>
     </>
     */
   )

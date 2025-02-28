@@ -97,15 +97,15 @@ const RecipePage = ({
       <div className="bg-white p-4 border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center">
           <div className="text-gray-800 font-medium mr-1">Ye</div>
-          <div className="text-red-700 font-bold">Bitir</div>
+          <div className="text-red-900 font-bold">Bitir</div>
         </div>
         <nav className="flex">
-          <a href="#" className="px-4 py-1 mx-1 text-red-700 hover:bg-red-50 rounded-full">Home</a>
+          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Home</a>
           <a href="#" className="px-4 py-1 mx-1 font-medium bg-gray-100 rounded-full">Recipes</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-700 hover:bg-red-50 rounded-full">Wheel</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-700 hover:bg-red-50 rounded-full">Add</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-700 hover:bg-red-50 rounded-full">About us</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-700 hover:bg-red-50 rounded-full">Profile</a>
+          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Wheel</a>
+          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Add</a>
+          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">About us</a>
+          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Profile</a>
         </nav>
       </div>
       
@@ -113,7 +113,7 @@ const RecipePage = ({
       <ImageComponent headerImage={headerImage}></ImageComponent><br />
       
       {/* Breadcrumbs */}
-      <div className="w-12/20 mx-auto bg-red-700 text-yellow-400 p-3 text-center rounded-full">
+      <div className="w-12/20 mx-auto bg-red-900 text-yellow-400 p-3 text-center rounded-full">
         {breadcrumbs.map((crumb, index) => (
           <React.Fragment key={index}>
             <a href="#" className="hover:underline">{crumb}</a>
@@ -123,14 +123,14 @@ const RecipePage = ({
       </div><br />
       
       {/* Recipe Title */}
-      <div className="w-16/20 mx-auto bg-red-700 text-white p-6 text-3xl font-bold text-center rounded-full">
+      <div className="w-16/20 mx-auto bg-red-900 text-white p-6 text-3xl font-bold text-center rounded-full">
         {title}
       </div>
       
       {/* Recipe Stats */}
       <div className="flex flex-wrap justify-center gap-2 py-3 bg-white-100">
         {/* Rating */}
-        <div className="bg-red-700 text-white px-3 py-2 rounded-full flex items-center gap-1">
+        <div className="bg-red-900 text-white px-3 py-2 rounded-full flex items-center gap-1">
           <span className="font-bold">{rating}/{totalStars}</span>
           <div className="flex">
             {renderStars()}
@@ -138,7 +138,7 @@ const RecipePage = ({
         </div>
         
         {/* Servings */}
-        <div className="bg-red-700 text-white px-3 py-2 rounded-full flex items-center gap-2">
+        <div className="bg-red-900 text-white px-3 py-2 rounded-full flex items-center gap-2">
           {/* Custom SVG Icon from SVGRepo */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +155,7 @@ const RecipePage = ({
 
         
         {/* Time */}
-        <div className="bg-red-700 text-white px-3 py-2 rounded-full flex items-center gap-2">
+        <div className="bg-red-900 text-white px-3 py-2 rounded-full flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -165,7 +165,7 @@ const RecipePage = ({
         {/* Comments */}
         <button 
           onClick={scrollToComments}
-          className="bg-red-700 hover:bg-red-600 text-white px-3 py-2 rounded-full flex items-center gap-2 transition duration-200"
+          className="bg-red-900 hover:bg-red-700 text-white px-3 py-2 rounded-full flex items-center gap-2 transition duration-200 cursor-pointer"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -176,7 +176,7 @@ const RecipePage = ({
         {/* Bookmark */}
         <button
           onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`${isBookmarked ? 'bg-black' : 'bg-red-700'} hover:opacity-80 text-white p-2 rounded-full flex items-center justify-center transition duration-200`}
+          className={`${isBookmarked ? 'bg-black' : 'bg-red-900'} hover:bg-red-700 text-white p-2 rounded-full flex items-center justify-center transition duration-200 cursor-pointer`}
           aria-label={isBookmarked ? "Remove from favorites" : "Add to favorites"}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" className="w-5 h-5">
@@ -186,7 +186,7 @@ const RecipePage = ({
       </div><br />
       
       {/* Recipe Content */}
-      <div className="w-19/20 mx-auto rounded-[40px] bg-red-700 text-white p-[48px] grid grid-cols-1 md:grid-cols-5 gap-8">
+      <div className="w-19/20 mx-auto rounded-[40px] bg-red-900 text-white p-[48px] grid grid-cols-1 md:grid-cols-5 gap-8">
         
         {/* Instructions*/}
         <div className="md:col-span-4">

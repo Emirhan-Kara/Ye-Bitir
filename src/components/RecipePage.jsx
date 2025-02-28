@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ImageComponent from './ImageComponent';
 import CommentsSection from './CommentsSection';
+import SuggestionsSection from './SuggestionsSection';
 
 // RecipePage component
 const RecipePage = ({ 
@@ -225,7 +226,9 @@ const RecipePage = ({
 
       </div><br />
 
-      
+      {/* Suggestions Section*/}
+      <SuggestionsSection /><br />
+
       {/* Comments Section */}
       <CommentsSection initialComments={initialComments}></CommentsSection><br />
     </div> 

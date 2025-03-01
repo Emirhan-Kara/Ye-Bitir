@@ -94,7 +94,7 @@ const RecipePage = ({
   
   return (
     <div className="w-full min-h-screen bg-white">
-      {/* Navigation */}
+      {/* Navigation 
       <div className="bg-white p-4 border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center">
           <div className="text-gray-800 font-medium mr-1">Ye</div>
@@ -108,7 +108,7 @@ const RecipePage = ({
           <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">About us</a>
           <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Profile</a>
         </nav>
-      </div>
+      </div>*/}
       
       {/* Image */}
       <ImageComponent headerImage={headerImage}></ImageComponent><br />

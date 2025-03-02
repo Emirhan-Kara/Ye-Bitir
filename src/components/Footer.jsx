@@ -19,30 +19,30 @@ const Footer = () => {
             and personalized recommendations.
           </p>
         </div>
-
+        
         {/* Middle Column - Quick Contact */}
         <div className="flex flex-col">
           <h3 className="text-xl font-semibold mb-4 text-center">Quick Contact</h3>
           <div className="flex flex-col items-center space-y-3">
-            <div className="flex items-center space-x-2">
-              <div className="bg-gray-200 p-2 rounded-full">
+            <div className="flex items-center w-full">
+              <div className="bg-gray-200 p-2 rounded-full w-10 h-10 flex items-center justify-center mr-3">
                 <Mail size={18} className="text-gray-700" />
               </div>
               <span className="text-sm">yebitir@gmail.com</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="bg-gray-200 p-2 rounded-full">
+            <div className="flex items-center w-full">
+              <div className="bg-gray-200 p-2 rounded-full w-10 h-10 flex items-center justify-center mr-3">
                 <Phone size={18} className="text-gray-700" />
               </div>
               <span className="text-sm">+90 500 000 00 00</span>
             </div>
           </div>
         </div>
-
+        
         {/* Right Column - Copyright and Legal Links */}
         <div className="flex flex-col text-sm text-gray-700">
           <div className="mb-2">
-            © 2025 Ye-Bitir. Created by Zaid, Emirhan, Hayrunnisa, 
+            © 2025 Ye-Bitir. Created by Zaid, Emirhan, Hayrunnisa,
             and Rumeysa.
             All rights reserved.
           </div>

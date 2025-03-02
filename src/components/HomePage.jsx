@@ -6,6 +6,8 @@ import RecipeCard from './RecipeCard';
 import RecipePage from './RecipePage';
 import SuggestionsSection from './SuggestionsSection';
 import RecipeWheel from './RecipeWheel';
+import Login from './Login';
+import SignUp from './SignUp'; // Import the SignUp component
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -258,35 +260,48 @@ const Home = () => {
 
 // Main App Component with Router
 const HomePage = () => {
-    return (
-      <Router>
-        <div className="min-h-screen bg-gray-300 flex flex-col">
-          {/* Header - isHomepage is true only when on home page */}
-          <Routes>
-            <Route path="/" element={<Header isHomepage={true} isLoggedIn={false} />} />
-            <Route path="*" element={<Header isHomepage={false} isLoggedIn={false} />} />
-          </Routes>
-          
-          {/* Main content area with padding to account for fixed header */}
-          <main className="flex-grow pt-20 pb-8">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
-              <Route path="/search" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} /> {/* Placeholder */}
-              <Route path="/recipe-wheel" element={<RecipeWheel />} />
-              <Route path="/recipes" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} /> {/* Placeholder */}
-              <Route path="/about" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">About Us</h1></div>} /> {/* Placeholder */}
-              <Route path="/add-recipe" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Add Recipe</h1></div>} /> {/* Placeholder */}
-              <Route path="/login" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Login</h1></div>} /> {/* Placeholder */}
-              <Route path="/profile" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Profile</h1></div>} /> {/* Placeholder */}
-            </Routes>
-          </main>
-          
-          {/* Footer */}
-          <Footer />
-        </div>
-      </Router>
-    );
-  };
+  return (
+    <Router>
+      <Routes>
+        {/* Full-screen Login and SignUp routes without Header/Footer */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        
+        {/* All other routes with standard layout */}
+        <Route path="*" element={<StandardLayout />} />
+      </Routes>
+    </Router>
+  );
+};
+
+// Standard layout with Header and Footer
+const StandardLayout = () => {
+  return (
+    <div className="min-h-screen bg-gray-300 flex flex-col">
+      {/* Header - isHomepage is true only when on home page */}
+      <Routes>
+        <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
+        <Route path="*" element={<Header isHomepage={false} isLoggedIn={true} />} />
+      </Routes>
+      
+      {/* Main content area with padding to account for fixed header */}
+      <main className="flex-grow pt-20 pb-8">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
+          <Route path="/search" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} />
+          <Route path="/recipe-wheel" element={<RecipeWheel />} />
+          <Route path="/recipes" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} />
+          <Route path="/about" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">About Us</h1></div>} />
+          <Route path="/add-recipe" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Add Recipe</h1></div>} />
+          <Route path="/profile" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Profile</h1></div>} />
+        </Routes>
+      </main>
+      
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+};
 
 export default HomePage;

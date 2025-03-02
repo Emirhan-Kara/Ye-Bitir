@@ -3,7 +3,7 @@ import { Mail, Phone } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-400 w-full py-6 px-4">
+    <footer className="bg-[#cfd8dc] w-full py-6 px-4">
       <div className="w-19/20 container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left Column - Logo and Description */}
         <div className="flex flex-col">

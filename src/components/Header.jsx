@@ -60,7 +60,7 @@ const Header = ({
 
   return (
     <header 
-      className={`bg-gray-400 text-white p-4 pl-8 pr-8 w-full fixed top-0 z-50 ${
+      className={`bg-[#cfd8dc] text-white p-4 pl-8 pr-8 w-full fixed top-0 z-50 ${
         isVisible 
           ? 'translate-y-0 shadow-md' 
           : '-translate-y-full'
@@ -73,7 +73,7 @@ const Header = ({
             <span className="font-bold text-xl text-gray-900" style={{ fontFamily: "'Rubik Doodle Shadow', cursive" }}>
               Ye
             </span>
-            <span className="font-bold text-xl text-red-800" style={{ fontFamily: "'Rubik Glitch', cursive" }}>
+            <span className="font-bold text-xl text-[#c0392b]" style={{ fontFamily: "'Rubik Glitch', cursive" }}>
               Bitir
             </span>
           </Link>
@@ -96,7 +96,7 @@ const Header = ({
               </div>
               <button 
                 type="submit" 
-                className="bg-red-800 hover:bg-red-700 text-white px-4 py-2 rounded-r-lg transition-colors cursor-pointer"
+                className="bg-[#c0392b] hover:bg-red-700 text-white px-4 py-2 rounded-r-lg transition-colors cursor-pointer"
                 aria-label="Search"
               >
                 <Search size={16} />
@@ -112,44 +112,44 @@ const Header = ({
         <div className="col-span-6 flex justify-between items-center">
           {/* Home */}
           <Link to="/" className="flex flex-col items-center pt-1 no-underline">
-            <Home size={24} className={isActiveRoute('/') ? "text-red-800" : "text-gray-900"} />
-            <span className={`text-sm pt-1 ${isActiveRoute('/') ? "font-bold text-red-800" : "text-gray-900"}`}>Home</span>
+            <Home size={24} className={isActiveRoute('/') ? "text-[#c0392b]" : "text-gray-900"} />
+            <span className={`text-sm pt-1 ${isActiveRoute('/') ? "font-bold text-[#c0392b]" : "text-gray-900"}`}>Home</span>
           </Link>
           
           {/* Recipes */}
           <Link to="/recipes" className="flex flex-col items-center pt-1 no-underline">
-            <UtensilsCrossed size={24} className={isActiveRoute('/recipes') ? "text-red-800" : "text-gray-900"} />
-            <span className={`text-sm pt-1 ${isActiveRoute('/recipes') ? "font-bold text-red-800" : "text-gray-900"}`}>Recipes</span>
+            <UtensilsCrossed size={24} className={isActiveRoute('/recipes') ? "text-[#c0392b]" : "text-gray-900"} />
+            <span className={`text-sm pt-1 ${isActiveRoute('/recipes') ? "font-bold text-[#c0392b]" : "text-gray-900"}`}>Recipes</span>
           </Link>
           
           {/* Recipe Wheel */}
           <Link to="/recipe-wheel" className="flex flex-col items-center pt-1 no-underline">
-            <Shuffle size={24} className={isActiveRoute('/recipe-wheel') ? "text-red-800" : "text-gray-900"} />
-            <span className={`text-sm pt-1 ${isActiveRoute('/recipe-wheel') ? "font-bold text-red-800" : "text-gray-900"}`}>Recipe Wheel</span>
+            <Shuffle size={24} className={isActiveRoute('/recipe-wheel') ? "text-[#c0392b]" : "text-gray-900"} />
+            <span className={`text-sm pt-1 ${isActiveRoute('/recipe-wheel') ? "font-bold text-[#c0392b]" : "text-gray-900"}`}>Recipe Wheel</span>
           </Link>
           
           {/* About Us */}
           <Link to="/about" className="flex flex-col items-center pt-1 no-underline">
-            <Info size={24} className={isActiveRoute('/about') ? "text-red-800" : "text-gray-900"} />
-            <span className={`text-sm pt-1 ${isActiveRoute('/about') ? "font-bold text-red-800" : "text-gray-900"}`}>About Us</span>
+            <Info size={24} className={isActiveRoute('/about') ? "text-[#c0392b]" : "text-gray-900"} />
+            <span className={`text-sm pt-1 ${isActiveRoute('/about') ? "font-bold text-[#c0392b]" : "text-gray-900"}`}>About Us</span>
           </Link>
           
           {/* Add Recipe */}
           <Link to="/add-recipe" className="flex flex-col items-center pt-1 no-underline">
-            <FilePlus size={24} className={isActiveRoute('/add-recipe') ? "text-red-800" : "text-gray-900"} />
-            <span className={`text-sm pt-1 ${isActiveRoute('/add-recipe') ? "font-bold text-red-800" : "text-gray-900"}`}>Add Recipe</span>
+            <FilePlus size={24} className={isActiveRoute('/add-recipe') ? "text-[#c0392b]" : "text-gray-900"} />
+            <span className={`text-sm pt-1 ${isActiveRoute('/add-recipe') ? "font-bold text-[#c0392b]" : "text-gray-900"}`}>Add Recipe</span>
           </Link>
           
           {/* Profile/Login */}
           <Link to={isLoggedIn ? "/profile" : "/login"} className="flex flex-col items-center no-underline">
-            <div className={`p-2 ${isActiveRoute(isLoggedIn ? '/profile' : '/login') ? "bg-red-700" : "bg-red-800"} rounded-full transition-colors`}>
+            <div className={`p-2 ${isActiveRoute(isLoggedIn ? '/profile' : '/login') ? "bg-red-700" : "bg-[#c0392b]"} rounded-full transition-colors`}>
               {isLoggedIn ? (
                 <User size={18} className="text-white" />
               ) : (
                 <LogIn size={18} className="text-white" />
               )}
             </div>
-            <span className="text-red-800 text-sm">{isLoggedIn ? "Profile" : "Login"}</span>
+            <span className="text-[#c0392b] text-sm">{isLoggedIn ? "Profile" : "Login"}</span>
           </Link>
         </div>
       </div>

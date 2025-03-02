@@ -8,6 +8,9 @@ import SuggestionsSection from './SuggestionsSection';
 import RecipeWheel from './RecipeWheel';
 import Login from './Login';
 import SignUp from './SignUp'; // Import the SignUp component
+import ProfilePage from './ProfilePage'; // Import the new ProfilePage component
+import AboutUs from './AboutUs';
+
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -225,7 +228,11 @@ const Home = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Hero section */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-red-800 mb-4">Welcome to Ye-Bitir</h1>
+      <h1 className="text-4xl font-bold mb-4">
+      <span className="text-[#34495e]"> Welcome to </span>
+      <span className="text-[#c0392b]">Ye</span>
+      <span className="text-[#34495e]"> Bitir</span>
+      </h1>
         <p className="text-xl text-gray-700 max-w-3xl mx-auto">
           Discover amazing recipes from around the world, share your own creations, and connect with food lovers.
         </p>
@@ -233,7 +240,7 @@ const Home = () => {
       
       {/* Featured recipes section */}
       <div className="mb-12">
-        <h2 className="text-3xl font-bold text-red-800 mb-6 text-center">Featured Recipes</h2>
+        <h2 className="text-3xl font-bold text-[#34495e] mb-6 text-center">Featured Recipes</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
           {dummyRecipes.map(recipe => (
             <Link 
@@ -277,7 +284,7 @@ const HomePage = () => {
 // Standard layout with Header and Footer
 const StandardLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-300 flex flex-col">
+    <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
       {/* Header - isHomepage is true only when on home page */}
       <Routes>
         <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
@@ -292,9 +299,10 @@ const StandardLayout = () => {
           <Route path="/search" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} />
           <Route path="/recipe-wheel" element={<RecipeWheel />} />
           <Route path="/recipes" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} />
-          <Route path="/about" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">About Us</h1></div>} />
+          <Route path="/about" element={<AboutUs></AboutUs>} />
           <Route path="/add-recipe" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Add Recipe</h1></div>} />
-          <Route path="/profile" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Profile</h1></div>} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/settings" element={<ProfilePage initialTab="settings" />} />
         </Routes>
       </main>
       

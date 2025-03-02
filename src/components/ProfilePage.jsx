@@ -137,12 +137,15 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
       {/* Profile Header */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex flex-col md:flex-row items-center">
-          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 mb-4 md:mb-0 md:mr-6">
+          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 mb-4 md:mb-0 md:mr-6 relative group">
             <img 
               src={userData.profileImage || "/api/placeholder/128/128"} 
               alt="Profile" 
               className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+              <span className="text-white text-sm font-medium">Change Photo</span>
+            </div>
           </div>
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-2xl font-bold mb-2 text-[#34495e]">{userData.username}</h1>
@@ -249,6 +252,24 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                     defaultValue="user@example.com"
                   />
                 </div>
+                <div>
+                  <label className="block text-[#34495e] mb-2">Profile Photo</label>
+                  <div className="flex items-center">
+                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 mr-4">
+                      <img 
+                        src={userData.profileImage || "/api/placeholder/64/64"} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="bg-gray-200 hover:bg-gray-300 text-[#34495e] px-4 py-2 rounded-md focus:outline-none transition-colors"
+                    >
+                      Change Photo
+                    </button>
+                  </div>
+                </div>
                 <button 
                   type="button"
                   className="bg-[#c0392b] hover:bg-[#a82315] text-white px-4 py-2 rounded-md focus:outline-none transition-colors"
@@ -263,13 +284,6 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[#34495e]">Email notifications</span>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#c0392b]"></div>
-                  </label>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#34495e]">New follower notifications</span>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" className="sr-only peer" defaultChecked />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#c0392b]"></div>

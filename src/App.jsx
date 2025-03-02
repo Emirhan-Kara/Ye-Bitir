@@ -1,11 +1,15 @@
 import RecipeCard from "./components/RecipeCard"
-import RecipeTitle from "./components/RecipePage"
+import RecipePage from "./components/RecipePage"
+import Header from "./components/Header"
+import Footer from "./components/Footer"
+import HomePage from "./components/HomePage"
 
 function App() {
   return (
-    
+    /*
     <>
-       <RecipeTitle 
+      <Header isHomepage={false} isLoggedIn={true}></Header>
+       <RecipePage 
          title="Cucumber Lemon Pepper Mustard"
          breadcrumbs={["All recipes", "Salads", "Fennel Orange Salad"]}
          rating={2.8}
@@ -48,8 +52,9 @@ function App() {
            }
          ]}
        />
+       <Footer></Footer>
     </>
-    
+    */
     /*
     <>
       <RecipeCard></RecipeCard>
@@ -57,6 +62,12 @@ function App() {
       <RecipeCard></RecipeCard>
     </>
     */
+
+    
+    <>
+      <HomePage></HomePage>
+    </>
+    
   )
 }
 

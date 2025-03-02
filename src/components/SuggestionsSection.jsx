@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import RecipeCard from './RecipeCard';
 
-const SuggestionsSection = () => {
+const SuggestionsSection = ({text = "Suggestions"}) => {
   const scrollContainerRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [maxScroll, setMaxScroll] = useState(0);
@@ -120,7 +120,7 @@ const SuggestionsSection = () => {
   return (
     <div className="w-19/20 mx-auto rounded-[40px] text-white p-6 mt-4 relative">
       <div className="w-3/20 mx-auto bg-red-900 text-yellow-400 p-3 text-2xl font-bold text-center rounded-full">
-        Suggestions
+        {text}
       </div>
       
       <div className="relative">

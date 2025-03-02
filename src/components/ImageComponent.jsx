@@ -17,7 +17,7 @@ const ImageComponent = ({ headerImage }) => {
 
       {/* Header Image with Button */}
       <div 
-        className="relative w-full h-90 bg-cover bg-center"
+        className="relative w-full h-110 bg-cover bg-center"
         style={{ backgroundImage: `url(${headerImage})` }}
       >
         {/* Open Full Image Button */}

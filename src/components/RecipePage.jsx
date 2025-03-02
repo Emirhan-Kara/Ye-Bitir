@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ImageComponent from './ImageComponent';
 import CommentsSection from './CommentsSection';
 import SuggestionsSection from './SuggestionsSection';
@@ -6,7 +7,7 @@ import SuggestionsSection from './SuggestionsSection';
 // RecipePage component
 const RecipePage = ({ 
   title, 
-  breadcrumbs, 
+  categories,
   rating, 
   servings, 
   timeInMins,
@@ -17,6 +18,7 @@ const RecipePage = ({
   initialComments
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const navigate = useNavigate();
   
   // Calculate stars based on rating
   const totalStars = 5;
@@ -88,38 +90,35 @@ const RecipePage = ({
     return stars;
   };
   
+  // Category button component
+  const CategoryButton = ({ label, value }) => {
+    return (
+      <button 
+        onClick={() => navigate(`/search?category=${label.toLowerCase()}&value=${value.toLowerCase()}`)}
+        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-full mr-2 transition-transform duration-200 hover:scale-105 cursor-pointer"
+      >
+        <span className="font-semibold">{label}:</span> {value}
+      </button>
+    );
+  };
+  
   const scrollToComments = () => {
     document.getElementById('comments-section').scrollIntoView({ behavior: 'smooth' });
   };
   
   return (
-    <div className="w-full min-h-screen bg-white">
-      {/* Navigation 
-      <div className="bg-white p-4 border-b border-gray-200 flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="text-gray-800 font-medium mr-1">Ye</div>
-          <div className="text-red-900 font-bold">Bitir</div>
-        </div>
-        <nav className="flex">
-          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Home</a>
-          <a href="#" className="px-4 py-1 mx-1 font-medium bg-gray-100 rounded-full">Recipes</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Wheel</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Add</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">About us</a>
-          <a href="#" className="px-4 py-1 mx-1 text-red-900 hover:bg-red-50 rounded-full">Profile</a>
-        </nav>
-      </div>*/}
-      
+    <div className="w-full min-h-screen bg-gray-300">
       {/* Image */}
       <ImageComponent headerImage={headerImage}></ImageComponent><br />
       
-      {/* Breadcrumbs */}
-      <div className="w-12/20 mx-auto bg-red-900 text-yellow-400 p-3 text-center rounded-full">
-        {breadcrumbs.map((crumb, index) => (
-          <React.Fragment key={index}>
-            <a href="#" className="hover:underline">{crumb}</a>
-            {index < breadcrumbs.length - 1 && <span className="mx-2">{'>'}</span>}
-          </React.Fragment>
+      {/* Categories */}
+      <div className="w-19/20 mx-auto flex flex-wrap justify-center rounded-2xl">
+        {categories && Object.entries(categories).map(([key, value], index) => (
+          <CategoryButton 
+            key={key} 
+            label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} 
+            value={value} 
+          />
         ))}
       </div><br />
       
@@ -227,7 +226,7 @@ const RecipePage = ({
       </div><br />
 
       {/* Suggestions Section*/}
-      <SuggestionsSection /><br />
+      <SuggestionsSection text='Suggestions'/><br />
 
       {/* Comments Section */}
       <CommentsSection initialComments={initialComments}></CommentsSection><br />

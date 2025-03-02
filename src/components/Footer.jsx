@@ -1,83 +1,62 @@
 import React from 'react';
-import { Search, Home, UtensilsCrossed, Shuffle, Info, FilePlus, User, LogIn } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
-const Footer = ({ isHomepage = false, isLoggedIn = false }) => {
+const Footer = () => {
   return (
-    <footer className="bg-red-900 text-white p-4 pl-8 pr-8">
-      <div className="grid grid-cols-12 gap-4 items-center">
-        {/* Column 1: Logo */}
-        <div className="col-span-1 flex items-center">
-          <div className="flex flex-col items-center">
-            <span className="font-bold text-xl" style={{ fontFamily: "'Rubik Doodle Shadow', cursive" }}>
-              Ye
-            </span>
-            <span className="font-bold text-xl" style={{ fontFamily: "'Rubik Glitch', cursive" }}>
-              Bitir
-            </span>
+    <footer className="bg-gray-400 w-full py-6 px-4">
+      <div className="w-19/20 container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Left Column - Logo and Description */}
+        <div className="flex flex-col">
+          <div className="flex items-center mb-3">
+            <h2 className="text-3xl font-bold">
+              <span className="text-gray-700" style={{ textShadow: '1px 1px 0 #000' }}>Ye</span>
+              <span className="text-red-800">Bitir</span>
+            </h2>
+          </div>
+          <p className="text-sm text-gray-700">
+            Ye-Bitir is a user-friendly recipe app offering diverse
+            cuisines, step-by-step cooking guides, meal planning,
+            and personalized recommendations.
+          </p>
+        </div>
+
+        {/* Middle Column - Quick Contact */}
+        <div className="flex flex-col">
+          <h3 className="text-xl font-semibold mb-4 text-center">Quick Contact</h3>
+          <div className="flex flex-col items-center space-y-3">
+            <div className="flex items-center space-x-2">
+              <div className="bg-gray-200 p-2 rounded-full">
+                <Mail size={18} className="text-gray-700" />
+              </div>
+              <span className="text-sm">yebitir@gmail.com</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="bg-gray-200 p-2 rounded-full">
+                <Phone size={18} className="text-gray-700" />
+              </div>
+              <span className="text-sm">+90 500 000 00 00</span>
+            </div>
           </div>
         </div>
 
-        {/* Columns 2-5: Search box (only on non-homepage) */}
-        {!isHomepage && (
-          <div className="col-span-5 flex items-center pr-16">
-            <div className="relative w-full">
-              <input 
-                type="text" 
-                placeholder="Search recipes..." 
-                className="bg-white text-gray-900 w-full p-2 rounded-lg pl-10"
-              />
-              <Search className="absolute left-3 top-2.5 text-gray-900" size={16} />
-            </div>
+        {/* Right Column - Copyright and Legal Links */}
+        <div className="flex flex-col text-sm text-gray-700">
+          <div className="mb-2">
+            © 2025 Ye-Bitir. Created by Zaid, Emirhan, Hayrunnisa, 
+            and Rumeysa.
+            All rights reserved.
           </div>
-        )}
-        
-        {/*<div className = "col-span 1"></div>*/}
-        
-        {/* Empty space for homepage */}
-        {isHomepage && <div className="col-span-5"></div>}
-
-        {/* Columns 7-12: Navigation buttons */}
-        <div className="col-span-6 flex justify-between items-center">
-          {/* Home - text in red-900 */}
-          <div className="flex flex-col items-center pt-1">
-            <Home size={24} className="text-yellow-400" />
-            <span className="text-yellow-400 text-sm pt-1">Home</span>
-          </div>
-          
-          {/* Recipes */}
-          <div className="flex flex-col items-center pt-1">
-            <UtensilsCrossed size={24} />
-            <span className="text-sm pt-1">Recipes</span>
-          </div>
-          
-          {/* Recipe Wheel */}
-          <div className="flex flex-col items-center pt-1">
-            <Shuffle size={24} />
-            <span className="text-sm pt-1">Recipe Wheel</span>
-          </div>
-          
-          {/* About Us */}
-          <div className="flex flex-col items-center pt-1">
-            <Info size={24} />
-            <span className="text-sm pt-1">About Us</span>
-          </div>
-          
-          {/* Add Recipe - with red circle background */}
-          <div className="flex flex-col items-center pt-1">
-            <FilePlus size={24} className="text-white" />
-            <span className="text-sm pt-1">Add Recipe</span>
-          </div>
-          
-          {/* Profile/Login - with red circle background */}
-          <div className="flex flex-col items-center">
-            <div className="p-2 bg-yellow-600 rounded-full">
-              {isLoggedIn ? (
-                <User size={18} className="text-white" />
-              ) : (
-                <LogIn size={18} className="text-white" />
-              )}
-            </div>
-            <span className="text-yellow-500 text-sm">{isLoggedIn ? "Profile" : "Login"}</span>
+          <div className="flex flex-wrap">
+            {/*<a href="/advertise" className="hover:underline mr-1">Advertise</a> |
+            <a href="/adchoices" className="hover:underline mx-1">AdChoices</a> |
+            <a href="/privacy" className="hover:underline mx-1">Privacy Policy</a> |
+            <a href="/visitor-agreement" className="hover:underline mx-1">Visitor Agreement</a> |
+            <a href="/kvkk" className="hover:underline mx-1">KVKK Compliance</a> |
+            <a href="/do-not-share" className="hover:underline mx-1">Do Not Share My Personal Data</a>*/}
+            <a href="/privacy" className="hover:underline mx-1">Privacy Policy</a> |
+            <a href="/about-us" className="hover:underline mx-1">About Us</a> |
+            <a href="/kvkk" className="hover:underline mx-1">KVKK Compliance</a> |
+            <a href="/privacy" className="hover:underline mx-1">Privacy Policy</a>
           </div>
         </div>
       </div>

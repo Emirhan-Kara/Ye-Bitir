@@ -11,6 +11,7 @@ import SignUp from './SignUp';
 import ProfilePage from './ProfilePage';
 import AboutUs from './AboutUs';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import AddRecipePage from './AddRecipePage';
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -295,6 +296,8 @@ const StandardLayout = () => {
       <Routes>
         <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
         <Route path="*" element={<Header isHomepage={false} isLoggedIn={true} />} />
+        <Route path="/" element={<Header isHomepage={true} isLoggedIn={false} />} />
+        <Route path="*" element={<Header isHomepage={false} isLoggedIn={false} />} />
       </Routes>
       
       {/* Main content area with padding to account for fixed header */}
@@ -320,6 +323,7 @@ const StandardLayout = () => {
             </div>
           } />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/add-recipe" element={<AddRecipePage />} />
           <Route path="/profile/settings" element={<ProfilePage initialTab="settings" />} />
         </Routes>
       </main>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Mock data - Replace with actual API calls in production
 const mockMyRecipes = [
@@ -68,12 +68,53 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
     recipesCount: 12,
     savedCount: 34,
   });
+  
+  // State for recipes - allows us to update them
+  const [mockMyRecipes, setMockMyRecipes] = useState([
+    { 
+      id: 1, 
+      title: 'Homemade Pizza with Fresh Basil and Mozzarella', 
+      image: 'https://media.istockphoto.com/id/1349560847/photo/slice-of-hot-pizza-large-cheese-lunch-or-dinner-traditional-italian-food-takeaway-with-melted.jpg?s=612x612&w=0&k=20&c=tUiljxr0yvJ-qsagIwcaNgQD226n6ZYgQIrk1dGk-Zo=', 
+      timeInMins: 45, 
+      rating: 4.7, 
+      servings: 4 
+    },
+    { 
+      id: 2, 
+      title: 'Triple Chocolate Cake with Ganache', 
+      image: 'https://media.istockphoto.com/id/1311220995/photo/chocolate-birthday-cake-with-chocolate-frosting-and-sprinkles.jpg?s=612x612&w=0&k=20&c=b0qHFczx3TjUG0iKLUB9TN0VVKpFHXQs2tBfW7UO3XI=', 
+      timeInMins: 60, 
+      rating: 4.9, 
+      servings: 8 
+    },
+    { 
+      id: 3, 
+      title: 'Beef Stir Fry with Seasonal Vegetables', 
+      image: 'https://media.istockphoto.com/id/1309136478/photo/beef-stir-fry-with-green-beans-and-tomatoes.jpg?s=612x612&w=0&k=20&c=WmK_2s3HG2YwbfAzMu-U2GjSuYW_ZuTy9N77wZ_PJHA=', 
+      timeInMins: 30, 
+      rating: 4.5, 
+      servings: 2 
+    },
+  ]);
 
   // In a real app, this would fetch user data and recipes from an API
   useEffect(() => {
-    // fetchUserData();
-    // fetchUserRecipes();
-    // fetchSavedRecipes();
+    // Load recipes from localStorage (for demo purposes)
+    try {
+      const storedRecipes = JSON.parse(localStorage.getItem('myRecipes'));
+      if (storedRecipes && storedRecipes.length > 0) {
+        // Update mockMyRecipes with stored recipes
+        setMockMyRecipes([...storedRecipes, ...mockMyRecipes.slice(0, Math.max(0, 3 - storedRecipes.length))]);
+        
+        // Update recipes count
+        setUserData(prev => ({
+          ...prev,
+          recipesCount: storedRecipes.length + mockMyRecipes.length
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading recipes from localStorage:', error);
+    }
   }, []);
 
   const RecipeCard = ({ recipe, isSaved }) => (
@@ -193,12 +234,12 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold mb-4 text-[#34495e]">My Recipes</h2>
-            <button className="bg-[#c0392b] hover:bg-[#a82315] text-white px-4 py-2 rounded-md focus:outline-none flex items-center transition-colors">
+            <Link to="/add-recipe" className="bg-[#c0392b] hover:bg-[#a82315] text-white px-4 py-2 rounded-md focus:outline-none flex items-center transition-colors no-underline">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 mr-2">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Add New Recipe
-            </button>
+            </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {mockMyRecipes.map(recipe => (

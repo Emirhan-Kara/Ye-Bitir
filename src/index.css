@@ -1,1 +1,125 @@
 @import "tailwindcss";
+
+:root {
+  /* Default theme variables (light mode) */
+  --color-primary: #c0392b;
+  --color-primary-hover: #a82315;
+  --color-secondary: #34495e;
+  --color-secondary-hover: #2c3e50;
+  --color-background: #f8f8f8;
+  --color-background-alt: #e2ece0;
+  --color-header-footer: #cfd8dc;
+  --color-card-background: #ffffff;
+  
+  --color-text-primary: #34495e;
+  --color-text-secondary: #707070;
+  --color-text-light: #ffffff;
+  --color-text-link: #c0392b;
+  --color-text-link-hover: #a82315;
+  
+  --color-button-primary: #c0392b;
+  --color-button-primary-hover: #a82315;
+  --color-button-secondary: #34495e;
+  --color-button-secondary-hover: #2c3e50;
+  --color-button-text: #ffffff;
+  
+  --color-input-background: #ffffff;
+  --color-input-border: #e2e8f0;
+  --color-input-focus: #c0392b;
+  
+  --color-panel-recipe: #e2ece0;
+  --color-panel-info: #34495e;
+  --color-panel-warning: #f39c12;
+  --color-panel-danger: #e74c3c;
+  
+  --color-feature-suggestions: #831010;
+  --color-feature-suggestions-text: #ffd700;
+}
+
+/* These CSS variables will be set dynamically in ThemeContext.jsx */
+/* The :root rules above serve as defaults for the light theme */
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply theme transition to common elements */
+a, button, input, select, textarea {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Theme utility classes */
+.bg-theme-primary {
+  background-color: var(--color-primary);
+}
+.bg-theme-secondary {
+  background-color: var(--color-secondary);
+}
+.bg-theme-background {
+  background-color: var(--color-background);
+}
+.bg-theme-card {
+  background-color: var(--color-card-background);
+}
+.bg-theme-header-footer {
+  background-color: var(--color-header-footer);
+}
+
+.text-theme-primary {
+  color: var(--color-text-primary);
+}
+.text-theme-secondary {
+  color: var(--color-text-secondary);
+}
+.text-theme-light {
+  color: var(--color-text-light);
+}
+.text-theme-link {
+  color: var(--color-text-link);
+}
+.hover\:text-theme-link-hover:hover {
+  color: var(--color-text-link-hover);
+}
+
+.border-theme-primary {
+  border-color: var(--color-primary);
+}
+.border-theme-secondary {
+  border-color: var(--color-secondary);
+}
+
+.btn-theme-primary {
+  background-color: var(--color-button-primary);
+  color: var(--color-button-text);
+}
+.btn-theme-primary:hover {
+  background-color: var(--color-button-primary-hover);
+}
+.btn-theme-secondary {
+  background-color: var(--color-button-secondary);
+  color: var(--color-button-text);
+}
+.btn-theme-secondary:hover {
+  background-color: var(--color-button-secondary-hover);
+}
+
+/* Recipe-specific theme classes */
+.recipe-card {
+  background-color: var(--color-panel-recipe);
+}
+.recipe-info {
+  background-color: var(--color-panel-info);
+}
+
+/* Dark mode specific overrides can be added here if needed */
+body.dark-mode {
+  /* These are set dynamically by ThemeContext, but you can add additional styles here */
+}

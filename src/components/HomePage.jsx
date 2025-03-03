@@ -7,10 +7,10 @@ import RecipePage from './RecipePage';
 import SuggestionsSection from './SuggestionsSection';
 import RecipeWheel from './RecipeWheel';
 import Login from './Login';
-import SignUp from './SignUp'; // Import the SignUp component
-import ProfilePage from './ProfilePage'; // Import the new ProfilePage component
+import SignUp from './SignUp';
+import ProfilePage from './ProfilePage';
 import AboutUs from './AboutUs';
-
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -220,27 +220,29 @@ const RecipeDetail = () => {
   );
 };
 
-
-
 // Home page component
 const Home = () => {
+  const { theme } = useTheme();
+  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero section */}
       <div className="text-center mb-12">
-      <h1 className="text-4xl font-bold mb-4">
-      <span className="text-[#34495e]"> Welcome to </span>
-      <span className="text-[#c0392b]">Ye</span>
-      <span className="text-[#34495e]"> Bitir</span>
-      </h1>
-        <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+        <h1 className="text-4xl font-bold mb-4">
+          <span style={{ color: theme.colors.text.primary }}> Welcome to </span>
+          <span style={{ color: theme.colors.primary }}>Ye</span>
+          <span style={{ color: theme.colors.text.primary }}> Bitir</span>
+        </h1>
+        <p className="text-xl max-w-3xl mx-auto" style={{ color: theme.colors.text.secondary }}>
           Discover amazing recipes from around the world, share your own creations, and connect with food lovers.
         </p>
       </div>
       
       {/* Featured recipes section */}
       <div className="mb-12">
-        <h2 className="text-3xl font-bold text-[#34495e] mb-6 text-center">Featured Recipes</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: theme.colors.text.primary }}>
+          Featured Recipes
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
           {dummyRecipes.map(recipe => (
             <Link 
@@ -268,23 +270,27 @@ const Home = () => {
 // Main App Component with Router
 const HomePage = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Full-screen Login and SignUp routes without Header/Footer */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        
-        {/* All other routes with standard layout */}
-        <Route path="*" element={<StandardLayout />} />
-      </Routes>
-    </Router>
+    <ThemeProvider> {/* Wrap ONCE at the top level */}
+      <Router>
+        <Routes>
+          {/* Full-screen Login and SignUp routes without Header/Footer */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          
+          {/* All other routes with standard layout */}
+          <Route path="*" element={<StandardLayout />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 
 // Standard layout with Header and Footer
 const StandardLayout = () => {
+  const { theme } = useTheme();
+  
   return (
-    <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.colors.background }}>
       {/* Header - isHomepage is true only when on home page */}
       <Routes>
         <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
@@ -292,15 +298,27 @@ const StandardLayout = () => {
       </Routes>
       
       {/* Main content area with padding to account for fixed header */}
-      <main className="flex-grow pt-20 pb-8">
+      <main className="flex-grow pt-20 pb-0">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
-          <Route path="/search" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} />
+          <Route path="/search" element={
+            <div className="container mx-auto py-8">
+              <h1 className="text-3xl font-bold" style={{ color: theme.colors.primary }}>Search page</h1>
+            </div>
+          } />
           <Route path="/recipe-wheel" element={<RecipeWheel />} />
-          <Route path="/recipes" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Search page</h1></div>} />
+          <Route path="/recipes" element={
+            <div className="container mx-auto py-8">
+              <h1 className="text-3xl font-bold" style={{ color: theme.colors.primary }}>Search page</h1>
+            </div>
+          } />
           <Route path="/about" element={<AboutUs></AboutUs>} />
-          <Route path="/add-recipe" element={<div className="container mx-auto py-8"><h1 className="text-3xl font-bold text-red-800">Add Recipe</h1></div>} />
+          <Route path="/add-recipe" element={
+            <div className="container mx-auto py-8">
+              <h1 className="text-3xl font-bold" style={{ color: theme.colors.primary }}>Add Recipe</h1>
+            </div>
+          } />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/settings" element={<ProfilePage initialTab="settings" />} />
         </Routes>

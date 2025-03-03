@@ -119,7 +119,7 @@ const SuggestionsSection = ({text = "Suggestions"}) => {
   
   return (
     <div className="w-19/20 mx-auto rounded-[40px] text-white p-6 mt-4 relative">
-      <div className="w-3/20 mx-auto bg-red-900 text-yellow-400 p-3 text-2xl font-bold text-center rounded-full">
+      <div className="w-5/20 mx-auto bg-red-900 text-yellow-400 p-3 text-2xl font-bold text-center rounded-full">
         {text}
       </div>
       

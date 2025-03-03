@@ -296,8 +296,6 @@ const StandardLayout = () => {
       <Routes>
         <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
         <Route path="*" element={<Header isHomepage={false} isLoggedIn={true} />} />
-        <Route path="/" element={<Header isHomepage={true} isLoggedIn={false} />} />
-        <Route path="*" element={<Header isHomepage={false} isLoggedIn={false} />} />
       </Routes>
       
       {/* Main content area with padding to account for fixed header */}

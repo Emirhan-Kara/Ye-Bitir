@@ -1,0 +1,504 @@
+/* Basic reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', sans-serif;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+}
+
+.homepage-container {
+  width: 1440px;
+  height: 2424px; /* Fixed height for desktop */
+  margin: 0 auto;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Allow scrolling if content exceeds frame height */
+  overflow-x: hidden;
+  position: relative; /* Important for footer positioning */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Login Banner */
+.login-banner {
+  background-color: #f9fafb;
+  text-align: center;
+  padding: 8px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+/* Search Section */
+.search-section {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.search-heading {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.search-text-red {
+  color: #b91c1c;
+}
+
+.search-text-yellow {
+  color: #eab308;
+}
+
+.search-text-black {
+  color: #111827;
+}
+
+.search-bar-container {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  background-color: #fee2e2;
+  border-radius: 9999px;
+  padding: 10px 15px;
+}
+
+.search-icon {
+  margin-right: 10px;
+  color: #b91c1c;
+}
+
+.search-input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: #4b5563;
+}
+
+/* Wheel Section */
+.wheel-section {
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 20px 0 40px;
+}
+
+.spin-button {
+  background-color: #fecaca;
+  color: #991b1b;
+  font-family: 'Rubik Glitch', cursive;
+  font-size: 32px;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  margin-bottom: 30px;
+  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.spin-button span {
+  color: #000000;
+}
+
+.spin-button:hover {
+  background-color: #fca5a5;
+}
+
+.spin-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Wheel Animation Styles */
+.wheel-container {
+  width: 100%;
+  max-width: 500px; /* Increased from 300px */
+  margin: 0 auto;
+  position: relative;
+}
+
+.wheel-title {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  z-index: 5;
+}
+
+.wheel-outer-ring {
+  border-radius: 50%;
+  background-color: #9E2A2B;
+  padding: 20px; /* Increased padding */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 0 auto;
+}
+
+.vitamin-wheel {
+  width: 100%;
+  display: block;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+/* Animation classes */
+.spin-animation {
+  animation: spin 4s cubic-bezier(0.26, 0.15, 0.26, 1) forwards;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  80% {
+    transform: rotate(720deg); /* Spin twice */
+  }
+  90% {
+    transform: rotate(710deg); /* Slight bounce back */
+  }
+  100% {
+    transform: rotate(720deg); /* End position */
+  }
+}
+
+
+/* Categories Section */
+.categories-section {
+  padding: 30px 20px;
+  margin-bottom: 150px; /* Added space after categories section */
+}
+
+.categories-heading {
+  background-color: #E9BFC2;
+  color: #4D2C2C;
+  text-align: center;
+  padding: 10px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  width: 260px;
+}
+
+.category-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.category-button {
+  background-color: #2F4858;
+  color: white;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: none;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-button:hover {
+  background-color: #1f313d;
+}
+
+.category-button span {
+  margin-left: 5px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.category-item {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.category-item:hover {
+  transform: translateY(-5px);
+}
+
+.category-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+.recipe-info {
+  background-color: #B22222;
+  color: white;
+  padding: 16px;
+}
+
+.recipe-title {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.cuisine-tag {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.cuisine-tag::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-image: url('/api/placeholder/18/18');
+  background-size: contain;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+
+/* Section spacer
+.section-spacer {
+  height: 800px;
+  width: 800%;
+} */
+
+/* Contact Section */
+.contact-section {
+  padding: 30px 20px;
+  margin-top: 150px; /* Added space before contact section */
+  background-color: #f3f4f6;
+}
+
+.contact-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.contact-heading {
+  background-color: #E9BFC2;
+  color: #783838;
+  text-align: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-input, 
+.contact-textarea {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #E9BFC2;
+  color: #4b5563;
+}
+
+.contact-textarea {
+  resize: none;
+  border-radius: 8px;
+  min-height: 80px;
+}
+
+.contact-input::placeholder,
+.contact-textarea::placeholder {
+  color: #9CA3AF;
+}
+
+.contact-submit-button {
+  background-color: #1f2937;
+  color: white;
+  font-weight: 500;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  width: fit-content;
+  align-self: center;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+}
+
+.contact-submit-button:hover {
+  background-color: #111827;
+}
+
+/* Footer styles */
+.footer {
+  background-color: #dad8d8;
+  width: 100%;
+  margin-top: auto; /* Push to bottom */
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
+
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+}
+
+.footer-logo {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.footer-logo .logo-ye,
+.footer-logo .logo-bitir {
+  font-family: 'Rubik Glitch', cursive;
+  font-size: 24px;
+}
+
+.footer-logo .logo-ye {
+  color: #374151;
+}
+
+.footer-logo .logo-bitir {
+  color: #b91c1c;
+}
+
+.footer-description {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #000;
+}
+
+.footer-contact {
+  text-align: center;
+}
+
+.footer-heading {
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #000;
+}
+
+.contact-icon {
+  margin-right: 6px;
+}
+
+.footer-legal {
+  font-size: 10px;
+  text-align: right;
+  max-width: 300px;
+  color: #000;
+}
+
+.footer-legal p {
+  margin-bottom: 3px;
+}
+
+.footer-links {
+  margin: 4px 0;
+}
+
+.footer-links a {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1440px) {
+  .homepage-container {
+    width: 100%;
+    height: auto;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .contact-section {
+    justify-content: center;
+  }
+  
+  .contact-form-container {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .footer-info, 
+  .footer-contact, 
+  .footer-legal {
+    margin: 10px 0;
+    text-align: center;
+  }
+}

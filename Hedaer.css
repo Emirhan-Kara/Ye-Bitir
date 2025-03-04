@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Glitch&family=Outfit&display=swap');
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background-color: #e5e7eb;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-ye {
+  font-family: 'Rubik Glitch', cursive;
+  font-size: 32px;
+  color: #374151;
+}
+
+.logo-bitir {
+  font-family: 'Rubik Glitch', cursive;
+  font-size: 32px;
+  color: #b91c1c;
+}
+
+.main-nav {
+  display: flex;
+  background-color: #fff;
+  border-radius: 9999px;
+  padding: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  padding: 8px 20px;
+  text-decoration: none;
+  color: #374151;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: #fee2e2;
+}
+
+.nav-item.active {
+  color: #b91c1c;
+  font-weight: 500;
+}

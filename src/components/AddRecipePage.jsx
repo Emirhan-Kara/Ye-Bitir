@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
 const AddRecipePage = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const { theme } = useTheme();
 
   // Recipe form state
   const [recipe, setRecipe] = useState({
@@ -222,53 +224,56 @@ const AddRecipePage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl bg-white">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-[#34495e] text-center">Create New Recipe</h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div 
+        className="bg-white rounded-lg shadow-md p-6"
+        style={{backgroundColor: theme.core.container, color:theme.core.text}}  >
+        <h1 className="text-2xl font-bold mb-6 text-center">Create New Recipe</h1>
         
         {/* Step Indicator */}
         <div className="flex items-center justify-center mb-8">
           {[1, 2, 3, 4, 5].map((step) => (
             <div key={step} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep >= step ? 'bg-[#c0392b] text-white' : 'bg-gray-200 text-[#34495e]'
-              }`}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: currentStep >= step ? theme.core.containerHoover : theme.headerfooter.background}}>
                 {step}
               </div>
               {step < 5 && (
-                <div className={`w-12 h-1 ${
-                  currentStep > step ? 'bg-[#c0392b]' : 'bg-gray-200'
-                }`}></div>
+                <div className="w-12 h-1"
+                      style={{ backgroundColor: currentStep > step ? theme.core.containerHoover : theme.headerfooter.background}}>
+                </div>
               )}
             </div>
           ))}
         </div>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}
+              style={{ borderColor: theme.core.text}}>
           {/* Step 1: Basic Info */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#34495e]">Recipe Basics</h2>
+              <h2 className="text-xl font-bold">Recipe Basics</h2>
               
               <div>
-                <label className="block text-[#34495e] mb-2">Recipe Title</label>
+                <label className="block mb-2">Recipe Title</label>
                 <input
                   type="text"
                   name="title"
                   value={recipe.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   placeholder="Enter recipe title"
+                  style={{ borderColor: theme.core.text}}
                 />
               </div>
               
               <div>
-                <label className="block text-[#34495e] mb-2">Short Description</label>
+                <label className="block  mb-2">Short Description</label>
                 <textarea
                   name="description"
                   value={recipe.description}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   placeholder="Briefly describe your recipe"
                   rows="3"
                 />
@@ -276,31 +281,33 @@ const AddRecipePage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#34495e] mb-2">Cuisine</label>
+                  <label className="block  mb-2">Cuisine</label>
                   <select
                     name="cuisine"
                     value={recipe.cuisine}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   >
-                    <option value="">Select Cuisine</option>
+                    <option value="" style={{ color: theme.headerfooter.logoRed}}>
+                        Select Cuisine
+                    </option>
                     {cuisineOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
+                      <option style={{ color: theme.headerfooter.logoRed}} key={option} value={option}>{option}</option>
                     ))}
                   </select>
                 </div>
                 
                 <div>
-                  <label className="block text-[#34495e] mb-2">Meal Type</label>
+                  <label className="block  mb-2">Meal Type</label>
                   <select
                     name="mealType"
                     value={recipe.mealType}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   >
-                    <option value="">Select Meal Type</option>
+                    <option style={{ color: theme.headerfooter.logoRed}} value="">Select Meal Type</option>
                     {mealTypeOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
+                      <option style={{ color: theme.headerfooter.logoRed}} key={option} value={option}>{option}</option>
                     ))}
                   </select>
                 </div>
@@ -308,31 +315,31 @@ const AddRecipePage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#34495e] mb-2">Diet</label>
+                  <label className="block  mb-2">Diet</label>
                   <select
                     name="diet"
                     value={recipe.diet}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   >
                     <option value="">Select Diet</option>
                     {dietOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
+                      <option style={{ color: theme.headerfooter.logoRed}} key={option} value={option}>{option}</option>
                     ))}
                   </select>
                 </div>
                 
                 <div>
-                  <label className="block text-[#34495e] mb-2">Main Ingredient</label>
+                  <label className="block  mb-2">Main Ingredient</label>
                   <select
                     name="mainIngredient"
                     value={recipe.mainIngredient}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   >
                     <option value="">Select Main Ingredient</option>
                     {mainIngredientOptions.map(option => (
-                      <option key={option} value={option}>{option}</option>
+                      <option style={{ color: theme.headerfooter.logoRed}} key={option} value={option}>{option}</option>
                     ))}
                   </select>
                 </div>
@@ -340,37 +347,37 @@ const AddRecipePage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[#34495e] mb-2">Prep Time (minutes)</label>
+                  <label className="block mb-2">Prep Time (minutes)</label>
                   <input
                     type="number"
                     name="prepTime"
                     value={recipe.prepTime}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     min="0"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[#34495e] mb-2">Cook Time (minutes)</label>
+                  <label className="block mb-2">Cook Time (minutes)</label>
                   <input
                     type="number"
                     name="cookTime"
                     value={recipe.cookTime}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     min="0"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-[#34495e] mb-2">Servings</label>
+                  <label className="block mb-2">Servings</label>
                   <input
                     type="number"
                     name="servings"
                     value={recipe.servings}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     min="1"
                   />
                 </div>
@@ -380,45 +387,46 @@ const AddRecipePage = () => {
           
           {/* Step 2: Ingredients */}
           {currentStep === 2 && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#34495e]">Ingredients</h2>
-              <p className="text-[#34495e] opacity-70">Add all ingredients needed for your recipe</p>
+            <div className="space-y-6"
+                  style={{ color:theme.core.text }}>
+              <h2 className="text-xl font-semibold">Ingredients</h2>
+              <p className=" opacity-70">Add all ingredients needed for your recipe</p>
               
               <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <div className="flex-1">
-                  <label className="block text-[#34495e] mb-2">Ingredient Name</label>
+                  <label className="block mb-2">Ingredient Name</label>
                   <input
                     type="text"
                     name="name"
                     value={currentIngredient.name}
                     onChange={handleIngredientChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     placeholder="e.g. Flour"
                   />
                 </div>
                 
                 <div className="md:w-1/4">
-                  <label className="block text-[#34495e] mb-2">Quantity</label>
+                  <label className="block  mb-2">Quantity</label>
                   <input
                     type="text"
                     name="quantity"
                     value={currentIngredient.quantity}
                     onChange={handleIngredientChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     placeholder="e.g. 2"
                   />
                 </div>
                 
                 <div className="md:w-1/4">
-                  <label className="block text-[#34495e] mb-2">Unit</label>
+                  <label className="block  mb-2">Unit</label>
                   <select
                     name="unit"
                     value={currentIngredient.unit}
                     onChange={handleIngredientChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   >
                     {unitOptions.map(unit => (
-                      <option key={unit} value={unit}>{unit}</option>
+                      <option style={{ color: theme.headerfooter.logoRed}} key={unit} value={unit}>{unit}</option>
                     ))}
                   </select>
                 </div>
@@ -427,7 +435,8 @@ const AddRecipePage = () => {
                   <button
                     type="button"
                     onClick={addIngredient}
-                    className="bg-[#c0392b] hover:bg-[#a82315] text-white px-4 py-2 rounded-md focus:outline-none transition-colors"
+                    className="border-2 bg-[#c0392b] hover:bg-[#a82315] hover:scale-110 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                    style={{ borderColor: theme.core.text }}
                   >
                     Add
                   </button>
@@ -436,10 +445,11 @@ const AddRecipePage = () => {
               
               {recipe.ingredients.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium mb-4 text-[#34495e]">Ingredient List</h3>
+                  <h3 className="text-lg font-medium mb-4 ">Ingredient List</h3>
                   <ul className="space-y-2">
                     {recipe.ingredients.map((ingredient) => (
-                      <li key={ingredient.id} className="flex justify-between items-center bg-[#e2ece0] p-3 rounded-md">
+                      <li key={ingredient.id} className="flex justify-between items-center p-3 rounded-md"
+                                              style={{backgroundColor: theme.core.containerHoover}}>
                         <span>
                           {ingredient.quantity} {ingredient.unit} {ingredient.name}
                         </span>
@@ -463,16 +473,16 @@ const AddRecipePage = () => {
           {/* Step 3: Instructions */}
           {currentStep === 3 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#34495e]">Instructions</h2>
-              <p className="text-[#34495e] opacity-70">Add step-by-step instructions for your recipe</p>
+              <h2 className="text-xl font-semibold ">Instructions</h2>
+              <p className=" opacity-70">Add step-by-step instructions for your recipe</p>
               
               <div className="flex space-x-4">
                 <div className="flex-1">
-                  <label className="block text-[#34495e] mb-2">Step Description</label>
+                  <label className="block  mb-2">Step Description</label>
                   <textarea
                     value={currentStepText}
                     onChange={(e) => setCurrentStepText(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     placeholder="Describe this step..."
                     rows="3"
                   />
@@ -482,7 +492,8 @@ const AddRecipePage = () => {
                   <button
                     type="button"
                     onClick={addStep}
-                    className="bg-[#c0392b] hover:bg-[#a82315] text-white px-4 py-2 rounded-md focus:outline-none transition-colors h-12"
+                    className="border-2 bg-[#c0392b] hover:bg-[#a82315] hover:scale-110 cursor-pointer text-white px-2 py-2 h-10 rounded-md focus:outline-none transition-colors"
+                    style={{borderColor: theme.core.text}}
                   >
                     Add Step
                   </button>
@@ -491,15 +502,17 @@ const AddRecipePage = () => {
               
               {recipe.steps.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium mb-4 text-[#34495e]">Instructions</h3>
+                  <h3 className="text-lg font-medium mb-4 ">Instructions</h3>
                   <ol className="space-y-4">
                     {recipe.steps.map((step, index) => (
-                      <li key={step.id} className="flex items-start bg-[#e2ece0] p-4 rounded-md">
-                        <span className="w-6 h-6 bg-[#c0392b] text-white rounded-full flex items-center justify-center mr-4 flex-shrink-0 mt-1">
+                      <li key={step.id} className="flex items-start bg-[#e2ece0] p-4 rounded-md"
+                                        style={{ backgroundColor: theme.core.containerHoover }}>
+                        <span className="w-6 h-6 rounded-full flex items-center justify-center mr-4 flex-shrink-0 mt-1"
+                              style={{ backgroundColor: theme.core.container, color: theme.core.text}}>
                           {index + 1}
                         </span>
                         <div className="flex-1">
-                          <p className="text-[#34495e]">{step.text}</p>
+                          <p className="">{step.text}</p>
                         </div>
                         <button
                           type="button"
@@ -521,8 +534,8 @@ const AddRecipePage = () => {
           {/* Step 4: Photo */}
           {currentStep === 4 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#34495e]">Recipe Photo</h2>
-              <p className="text-[#34495e] opacity-70">Add a photo of your finished recipe</p>
+              <h2 className="text-xl font-semibold ">Recipe Photo</h2>
+              <p className=" opacity-70">Add a photo of your finished recipe</p>
               
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-full">
@@ -530,7 +543,7 @@ const AddRecipePage = () => {
                     type="file"
                     accept="image/*"
                     onChange={handlePhotoChange}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   />
                 </div>
                 
@@ -543,8 +556,9 @@ const AddRecipePage = () => {
                     />
                   </div>
                 ) : (
-                  <div className="mt-4 w-full max-w-lg bg-gray-100 h-64 rounded-lg flex items-center justify-center">
-                    <p className="text-gray-400">No photo selected</p>
+                  <div className="mt-4 w-full max-w-lg h-64 rounded-lg flex items-center justify-center"
+                      style={{backgroundColor: theme.core.containerHoover}}>
+                    <p className="text-white">No photo selected</p>
                   </div>
                 )}
               </div>
@@ -554,10 +568,11 @@ const AddRecipePage = () => {
           {/* Step 5: Review */}
           {currentStep === 5 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-[#34495e]">Review Your Recipe</h2>
-              <p className="text-[#34495e] opacity-70">Please review your recipe before submitting</p>
+              <h2 className="text-xl font-semibold ">Review Your Recipe</h2>
+              <p className=" opacity-70">Please review your recipe before submitting</p>
               
-              <div className="bg-[#f9f9f9] rounded-lg p-6 space-y-6">
+              <div className="rounded-lg p-6 space-y-6"
+                  style={{ backgroundColor: theme.core.containerHoover}}>
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Photo */}
                   <div className="md:w-1/3">
@@ -576,8 +591,8 @@ const AddRecipePage = () => {
                   
                   {/* Basic Info */}
                   <div className="md:w-2/3 space-y-3">
-                    <h3 className="text-xl font-bold text-[#34495e]">{recipe.title || "Untitled Recipe"}</h3>
-                    <p className="text-gray-600">{recipe.description || "No description provided."}</p>
+                    <h3 className="text-xl font-bold ">{recipe.title || "Untitled Recipe"}</h3>
+                    <p className="text-gray-600" >{recipe.description || "No description provided."}</p>
                     
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                       <div>
@@ -614,7 +629,7 @@ const AddRecipePage = () => {
                 
                 {/* Ingredients */}
                 <div className="border-t pt-4">
-                  <h4 className="text-lg font-semibold text-[#34495e] mb-3">Ingredients</h4>
+                  <h4 className="text-lg font-semibold  mb-3">Ingredients</h4>
                   {recipe.ingredients.length > 0 ? (
                     <ul className="list-disc pl-5 space-y-1">
                       {recipe.ingredients.map((ingredient) => (
@@ -630,7 +645,7 @@ const AddRecipePage = () => {
                 
                 {/* Instructions */}
                 <div className="border-t pt-4">
-                  <h4 className="text-lg font-semibold text-[#34495e] mb-3">Instructions</h4>
+                  <h4 className="text-lg font-semibold  mb-3">Instructions</h4>
                   {recipe.steps.length > 0 ? (
                     <ol className="list-decimal pl-5 space-y-2">
                       {recipe.steps.map((step, index) => (
@@ -653,7 +668,8 @@ const AddRecipePage = () => {
               <button
                 type="button"
                 onClick={prevStep}
-                className="bg-gray-200 hover:bg-gray-300 text-[#34495e] px-6 py-2 rounded-md focus:outline-none transition-colors"
+                className="border hover:brightness-80 px-6 py-2 rounded-md focus:outline-none transition-colors cursor-pointer hover:scale-110"
+                style={{ color: theme.core.text,  backgroundColor: theme.headerfooter.background}}
               >
                 Previous
               </button>
@@ -662,7 +678,8 @@ const AddRecipePage = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="bg-white hover:bg-gray-100 text-[#c0392b] border border-[#c0392b] px-6 py-2 rounded-md focus:outline-none transition-colors"
+              className="border hover:brightness-80 px-6 py-2 rounded-md focus:outline-none transition-colors cursor-pointer hover:scale-110"
+                style={{ color: theme.core.text,  backgroundColor: theme.headerfooter.background}}
             >
               Cancel
             </button>
@@ -671,7 +688,8 @@ const AddRecipePage = () => {
               <button
                 type="button"
                 onClick={nextStep}
-                className="bg-[#c0392b] hover:bg-[#a82315] text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                className="bg-[#c0392b] hover:bg-[#a82315] border-2 hover:scale-110 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                style={{ borderColor: theme.core.text }}
               >
                 Next
               </button>
@@ -679,7 +697,8 @@ const AddRecipePage = () => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="bg-[#c0392b] hover:bg-[#a82315] text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                className="border-2 bg-[#c0392b] hover:bg-[#a82315] hover:scale-110 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                style={{ borderColor: theme.core.text }}
               >
                 Submit Recipe
               </button>

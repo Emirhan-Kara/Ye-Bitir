@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import AnimatedFoodIcons from './AnimatedFoodIcons';
 
 // Import for animations
 import { motion } from 'framer-motion';
@@ -108,24 +109,7 @@ const AboutUs = () => {
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           {/* Animated food icons background */}
-          <div className="absolute w-full h-full">
-            {[...Array(10)].map((_, i) => (
-              <div 
-                key={i}
-                className="absolute animate-float"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  animationDuration: `${15 + Math.random() * 10}s`,
-                  fontSize: `${1 + Math.random() * 1.5}rem`,
-                  opacity: 0.2
-                }}
-              >
-                {['🍕', '🍲', '🍝', '🍜', '🍗', '🍰', '🥗'][Math.floor(Math.random() * 7)]}
-              </div>
-            ))}
-          </div>
+          <AnimatedFoodIcons count={25} />
         </div>
 
         <motion.div 
@@ -281,6 +265,8 @@ const AboutUs = () => {
         style={{ backgroundColor: theme.core.container, color: theme.core.text }} 
         className="py-20 text-center relative overflow-hidden"
       >
+        
+        <AnimatedFoodIcons count={40} />
         {/* Background pattern */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 opacity-10">

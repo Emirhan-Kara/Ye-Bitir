@@ -21,7 +21,7 @@ export const themes = {
     core: {
       background: '#e0e0e0',    // white
       container: '#bfd1bc',     // mint-green
-      containerHoover: '#8ca088', // darker mint-green
+      containerHoover: '#a8b8a6', // darker mint-green
       text: '#34495e',          // dark blue
     },
   },

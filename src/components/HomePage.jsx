@@ -13,6 +13,8 @@ import AboutUs from './AboutUs';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import AddRecipePage from './AddRecipePage';
 import SearchPage from './SearchPage';
+import KVKKCompliance from './KVKKCompliance';
+import PrivacyPolicy from './PrivacyPolicy';
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -311,6 +313,8 @@ const StandardLayout = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/add-recipe" element={<AddRecipePage />} />
           <Route path="/profile/settings" element={<ProfilePage initialTab="settings" />} />
+          <Route path="/kvkk" element={<KVKKCompliance />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
         </Routes>
       </main>
       

@@ -1,11 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import RecipeCard from './RecipeCard';
+import { useTheme } from '../context/ThemeContext';
 
-const SuggestionsSection = ({text = "Suggestions"}) => {
+const SuggestionsSection = ({text = ""}) => {
   const scrollContainerRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [maxScroll, setMaxScroll] = useState(0);
   const [cardWidth, setCardWidth] = useState(300); // Default estimate
+  const { theme } = useTheme();
   
   // Dummy data for recipe suggestions
   const dummySuggestions = [
@@ -118,18 +120,23 @@ const SuggestionsSection = ({text = "Suggestions"}) => {
   };
   
   return (
-    <div className="w-19/20 mx-auto rounded-[40px] text-white p-6 mt-4 relative">
-      <div className="w-5/20 mx-auto bg-red-900 text-yellow-400 p-3 text-2xl font-bold text-center rounded-full">
-        {text}
-      </div>
+    <div className="w-19/20 mx-auto rounded-[40px] text-white p-6 mt-4 relative"
+          style={{ color: theme.core.text }}>
+      {text && (
+        <div className="w-5/20 mx-auto p-3 text-2xl font-bold text-center rounded-full"
+            style={{ backgroundColor: theme.core.container }}>
+          {text}
+        </div>
+      )}
       
       <div className="relative">
         {/* Left Arrow - Only show if not at the start */}
         {scrollPosition > 0 && (
           <button 
             onClick={scrollLeft}
-            className="absolute -left-6 top-1/2 transform -translate-y-1/2 z-10 bg-yellow-600 hover:bg-yellow-500 text-white p-3 rounded-full shadow-lg"
+            className="absolute -left-6 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full shadow-lg cursor-pointer hover:scale-125"
             aria-label="Scroll left"
+            style={{ backgroundColor: theme.core.containerHoover }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -179,8 +186,9 @@ const SuggestionsSection = ({text = "Suggestions"}) => {
         {scrollPosition < maxScroll && (
           <button 
             onClick={scrollRight}
-            className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-10 bg-yellow-600 hover:bg-yellow-500 text-white p-3 rounded-full shadow-lg"
+            className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full shadow-lg cursor-pointer hover:scale-125"
             aria-label="Scroll right"
+            style={{ backgroundColor: theme.core.containerHoover }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

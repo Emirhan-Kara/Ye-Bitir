@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import AnimatedFoodIcons from './AnimatedFoodIcons';
 import './RecipeWheel.css'; // This now contains all our CSS
 
 const RecipeWheel = () => {
@@ -11,6 +12,7 @@ const RecipeWheel = () => {
   
   // Refs
   const wheelRef = useRef(null);
+  const recipeCardRef = useRef(null);
   
   // States
   const [isSpinning, setIsSpinning] = useState(false);
@@ -127,6 +129,16 @@ const RecipeWheel = () => {
       const randomIndex = Math.floor(Math.random() * dummyRecipes.length);
       setSelectedRecipe(dummyRecipes[randomIndex]);
       setShowRecipe(true);
+      
+      // Give a small delay to ensure the recipe card is rendered before scrolling
+      setTimeout(() => {
+        if (recipeCardRef.current) {
+          recipeCardRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' // Center the element in the viewport
+          });
+        }
+      }, 100);
     }, 3000);
   };
   
@@ -156,9 +168,18 @@ const RecipeWheel = () => {
   ];
   
   return (
-    <div className="min-h-screen py-8 px-4"
-         style={{ color: theme.core.text }}>
-      <div className="max-w-6xl mx-auto">
+    <div 
+      className="min-h-screen py-8 px-4 relative overflow-hidden"
+      style={{ color: theme.core.text, backgroundColor: theme.core.background }}
+    >
+      {/* Background with animated food icons */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 bg-pattern opacity-5"></div>
+        {/* Add more food icons for a fun wheel atmosphere */}
+        <AnimatedFoodIcons count={60} />
+      </div>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
         <h1 className="edgy-title text-center mb-8 spin-in">RECIPE WHEEL</h1>
         <p className="text-xl mb-8 text-center fade-in-up">
           Select your preferences and spin the wheel to discover your next meal!
@@ -295,7 +316,10 @@ const RecipeWheel = () => {
           
           {/* Recipe Card Display - with zoom in animation when recipe is selected */}
           {showRecipe && selectedRecipe && (
-            <div className="recipe-card-container transition-all duration-500 transform scale-100 hover:scale-105 mb-8 fade-in-up">
+            <div 
+              ref={recipeCardRef}
+              className="recipe-card-container transition-all duration-500 transform scale-100 hover:scale-105 mb-8 fade-in-up"
+            >
               {/* Wrap in larger container for styling and transitions */}
               <div className="recipe-card p-4 rounded-xl shadow-xl" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
                 <RecipeCard
@@ -325,6 +349,14 @@ const RecipeWheel = () => {
           )}
         </div>
       </div>
+      
+      {/* Add background pattern style */}
+      <style jsx>{`
+        .bg-pattern {
+          background-image: radial-gradient(currentColor 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+      `}</style>
     </div>
   );
 };

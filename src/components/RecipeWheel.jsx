@@ -1,12 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
-import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
 import './RecipeWheel.css'; // This now contains all our CSS
 
+// Memoized AnimatedFoodIconsBackground component to prevent re-renders
+const AnimatedFoodIconsBackground = React.memo(({ count }) => {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 bg-pattern opacity-5"></div>
+      <AnimatedFoodIcons count={count} />
+    </div>
+  );
+});
+
 const RecipeWheel = () => {
   const { theme } = useTheme();
+  const { isLoggedIn, currentUser } = useAuth();
+  
   // Navigation
   const navigate = useNavigate();
   
@@ -96,6 +109,15 @@ const RecipeWheel = () => {
   
   // Handle wheel spin
   const handleSpin = () => {
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      // Save current path for redirect after login
+      localStorage.setItem('redirectPath', '/recipe-wheel');
+      // Redirect to login page
+      navigate('/login');
+      return;
+    }
+    
     // Reset if already showing a recipe
     if (showRecipe) {
       setShowRecipe(false);
@@ -166,23 +188,33 @@ const RecipeWheel = () => {
     { color: '#10b981' }, // Emerald
     { color: '#06b6d4' }  // Cyan
   ];
+
+  // Memoize the welcome message to prevent unnecessary re-renders
+  const welcomeMessage = useMemo(() => {
+    if (isLoggedIn && currentUser) {
+      return `Welcome, ${currentUser.role === 'admin' ? 'Admin' : 'User'} (${currentUser.email}). `;
+    }
+    return '';
+  }, [isLoggedIn, currentUser]);
   
   return (
     <div 
       className="min-h-screen py-8 px-4 relative overflow-hidden"
       style={{ color: theme.core.text, backgroundColor: theme.core.background }}
     >
-      {/* Background with animated food icons */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-pattern opacity-5"></div>
-        {/* Add more food icons for a fun wheel atmosphere */}
-        <AnimatedFoodIcons count={60} />
-      </div>
+      {/* Background with animated food icons - Memoized to prevent re-renders */}
+      <AnimatedFoodIconsBackground count={60} />
       
       <div className="max-w-6xl mx-auto relative z-10">
         <h1 className="edgy-title text-center mb-8 spin-in">RECIPE WHEEL</h1>
         <p className="text-xl mb-8 text-center fade-in-up">
+          {welcomeMessage}
           Select your preferences and spin the wheel to discover your next meal!
+          {!isLoggedIn && (
+            <span className="block text-sm mt-2" style={{ color: theme.headerfooter.logoRed }}>
+              (You need to login to spin the wheel)
+            </span>
+          )}
         </p>
         
         {/* Filter selectors */}

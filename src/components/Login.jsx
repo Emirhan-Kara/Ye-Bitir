@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,11 +17,17 @@ const Login = () => {
       return;
     }
     
-    // You would typically handle authentication here
-    console.log('Login attempted with:', { email, password });
+    // Attempt login with our auth context
+    const result = login(email, password);
     
-    // For testing, simulate successful login
-    alert('Login successful (test)');
+    if (result.success) {
+      // Check if there's a redirect path in localStorage (from private routes)
+      const redirectPath = localStorage.getItem('redirectPath') || '/';
+      localStorage.removeItem('redirectPath'); // Clear it
+      navigate(redirectPath);
+    } else {
+      setError(result.message || 'Invalid email or password');
+    }
   };
 
   return (
@@ -38,6 +47,13 @@ const Login = () => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Log in to your account
         </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Demo Credentials:
+          <br />
+          Admin: admin@gmail.com / Test1234
+          <br />
+          User: user@gmail.com / Test1234
+        </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import AnimatedFoodIcons from './AnimatedFoodIcons';
+
+// Memoized AnimatedFoodIconsBackground component to prevent re-renders
+const AnimatedFoodIconsBackground = React.memo(({ count }) => {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 bg-pattern opacity-5"></div>
+      <AnimatedFoodIcons count={count} />
+    </div>
+  );
+});
 
 const AddRecipePage = () => {
   const navigate = useNavigate();
@@ -224,9 +235,11 @@ const AddRecipePage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl overflow-hidden">
+      {/* Animated food icons background - positioned absolutely but only in this container */}
+      <AnimatedFoodIconsBackground count={60} />
       <div 
-        className="bg-white rounded-lg shadow-md p-6"
+        className="bg-white rounded-lg shadow-md p-6 relative"
         style={{backgroundColor: theme.core.container, color:theme.core.text}}  >
         <h1 className="text-2xl font-bold mb-6 text-center">Create New Recipe</h1>
         

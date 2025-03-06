@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useParams, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import RecipeCard from './RecipeCard';
@@ -11,6 +11,7 @@ import SignUp from './SignUp';
 import ProfilePage from './ProfilePage';
 import AboutUs from './AboutUs';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import AddRecipePage from './AddRecipePage';
 import SearchPage from './SearchPage';
 import KVKKCompliance from './KVKKCompliance';
@@ -194,6 +195,30 @@ const dummyRecipes = [
   }
 ];
 
+// Improved Private Route component that properly handles redirects
+const PrivateRoute = ({ children }) => {
+  const { isLoggedIn } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!isLoggedIn) {
+      // Save the current path for redirect after login
+      localStorage.setItem('redirectPath', location.pathname);
+      // Redirect to login
+      navigate('/login');
+    }
+  }, [isLoggedIn, location.pathname, navigate]);
+  
+  // Don't render anything while redirecting
+  if (!isLoggedIn) {
+    return null;
+  }
+  
+  // Render the protected component if user is logged in
+  return children;
+};
+
 // Recipe detail component that displays a specific recipe
 const RecipeDetail = () => {
   const { recipeId } = useParams();
@@ -227,6 +252,7 @@ const RecipeDetail = () => {
 // Home page component
 const Home = () => {
   const { theme } = useTheme();
+  const { isLoggedIn, currentUser } = useAuth();
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -274,31 +300,41 @@ const Home = () => {
 // Main App Component with Router
 const HomePage = () => {
   return (
-    <ThemeProvider> {/* Wrap ONCE at the top level */}
-      <Router>
-        <Routes>
-          {/* Full-screen Login and SignUp routes without Header/Footer */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          
-          {/* All other routes with standard layout */}
-          <Route path="*" element={<StandardLayout />} />
-        </Routes>
-      </Router>
+    <ThemeProvider> {/* Wrap with ThemeProvider */}
+      <AuthProvider> {/* Wrap with AuthProvider */}
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
+  );
+};
+
+// Separate component for routes to access hooks
+const AppRoutes = () => {
+  return (
+    <Routes>
+      {/* Full-screen Login and SignUp routes without Header/Footer */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      
+      {/* All other routes with standard layout */}
+      <Route path="*" element={<StandardLayout />} />
+    </Routes>
   );
 };
 
 // Standard layout with Header and Footer
 const StandardLayout = () => {
   const { theme } = useTheme();
+  const { isLoggedIn, currentUser } = useAuth();
   
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.core.background }}>
       {/* Header - isHomepage is true only when on home page */}
       <Routes>
-        <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
-        <Route path="*" element={<Header isHomepage={false} isLoggedIn={true} />} />
+        <Route path="/" element={<Header isHomepage={true} isLoggedIn={isLoggedIn} user={currentUser} />} />
+        <Route path="*" element={<Header isHomepage={false} isLoggedIn={isLoggedIn} user={currentUser} />} />
       </Routes>
       
       {/* Main content area with padding to account for fixed header */}
@@ -306,13 +342,26 @@ const StandardLayout = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
-          <Route path="/search" element={<SearchPage /> } />
+          <Route path="/search" element={<SearchPage />} />
+          {/* RecipeWheel is now public - authentication check will happen on spin */}
           <Route path="/recipe-wheel" element={<RecipeWheel />} />
-          <Route path="/recipes" element={<SearchPage /> } />
-          <Route path="/about" element={<AboutUs></AboutUs>} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/add-recipe" element={<AddRecipePage />} />
-          <Route path="/profile/settings" element={<ProfilePage initialTab="settings" />} />
+          <Route path="/recipes" element={<SearchPage />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/profile" element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          } />
+          <Route path="/add-recipe" element={
+            <PrivateRoute>
+              <AddRecipePage />
+            </PrivateRoute>
+          } />
+          <Route path="/profile/settings" element={
+            <PrivateRoute>
+              <ProfilePage initialTab="settings" />
+            </PrivateRoute>
+          } />
           <Route path="/kvkk" element={<KVKKCompliance />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
         </Routes>

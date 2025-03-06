@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import RecipeCard from './RecipeCard';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
-
-// Import for animations
 import { motion } from 'framer-motion';
 
+// Memoized AnimatedFoodIconsBackground component to prevent re-renders
+const AnimatedFoodIconsBackground = React.memo(({ count }) => {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 bg-pattern opacity-5"></div>
+      <AnimatedFoodIcons count={count} />
+    </div>
+  );
+});
 const mockSavedRecipes = [
   { 
     id: 4, 
@@ -73,12 +81,33 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
   ]);
 
   const { theme } = useTheme();
+  const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
   
   // Refs for scroll animations
   const myRecipesRef = useRef(null);
   const savedRecipesRef = useRef(null);
   const settingsRef = useRef(null);
+
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  // Update username based on user email if available
+  useEffect(() => {
+    if (currentUser && currentUser.email) {
+      // Extract username from email (remove @domain.com)
+      const username = currentUser.email.split('@')[0];
+      // Update the userData with the email or username
+      setUserData(prev => ({
+        ...prev,
+        username: username.charAt(0).toUpperCase() + username.slice(1), // Capitalize first letter
+        email: currentUser.email
+      }));
+    }
+  }, [currentUser]);
 
   // In a real app, this would fetch user data and recipes from an API
   useEffect(() => {
@@ -158,8 +187,8 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 bg-pattern opacity-5"></div>
-        {/* Animated food icons */}
-        <AnimatedFoodIcons count={35} />
+        {/* Background with animated food icons - Memoized to prevent re-renders */}
+        <AnimatedFoodIconsBackground count={60} />
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
@@ -200,6 +229,14 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                   style={{ color: theme.core.text }}
                 >
                   {userData.username}
+                  {currentUser && currentUser.role && (
+                    <span className="ml-2 text-sm px-2 py-1 rounded" style={{ 
+                      backgroundColor: currentUser.role === 'admin' ? theme.headerfooter.logoRed : '#4CAF50',
+                      color: 'white'
+                    }}>
+                      {currentUser.role}
+                    </span>
+                  )}
                 </motion.h1>
                 <motion.p 
                   initial={{ opacity: 0 }}
@@ -228,12 +265,12 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
               </div>
             </div>
             
-            {/* Add New Recipe button positioned to the right */}
+            {/* Add New Recipe button and Logout button positioned to the right */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="mt-4 md:mt-0"
+              className="mt-4 md:mt-0 flex flex-col gap-3"
             >
               <Link 
                 to="/add-recipe" 
@@ -251,6 +288,24 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                 </svg>
                 Add New Recipe
               </Link>
+              
+              {/* Logout Button */}
+              <button 
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-md flex items-center transition-all duration-300 hover:shadow-lg cursor-pointer hover:scale-105"
+                style={{ 
+                  backgroundColor: theme.core.containerHoover, 
+                  color: theme.core.text,
+                  transform: 'scale(1)',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 mr-2">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
             </motion.div>
           </div>
         </motion.div>
@@ -430,7 +485,8 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                           borderColor: theme.core.containerHoover,
                           color: theme.core.text
                         }}
-                        defaultValue="user@example.com"
+                        defaultValue={userData.email || "user@example.com"}
+                        readOnly={!!userData.email}
                       />
                     </div>
                     
@@ -475,6 +531,16 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                       Delete Account
+                    </button>
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center transition-all duration-300 hover:translate-x-2 hover:font-medium p-2 rounded-md hover:bg-opacity-10 hover:bg-white"
+                      style={{ color: theme.headerfooter.logoRed }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 mr-2">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Logout
                     </button>
                   </div>
                 </motion.div>

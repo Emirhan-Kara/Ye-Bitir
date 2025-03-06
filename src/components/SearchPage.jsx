@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import RecipeCard from './RecipeCard';
 import { motion } from 'framer-motion';
-import './SearchPage.css'; // Import the external CSS file
+import './SearchPage.css';
+import AnimatedFoodIcons from './AnimatedFoodIcons';
+
+// Memoized AnimatedFoodIconsBackground component to prevent re-renders
+const AnimatedFoodIconsBackground = React.memo(({ count }) => {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 bg-pattern opacity-5"></div>
+      <AnimatedFoodIcons count={count} />
+    </div>
+  );
+});
 
 const SearchPage = () => {
   const { theme } = useTheme();
@@ -431,25 +442,7 @@ const SearchPage = () => {
       >
         <div className="hero-background">
           <div className="hero-pattern bg-pattern"></div>
-          {/* Animated food icons background */}
-          <div className="hero-icons-container">
-            {[...Array(8)].map((_, i) => (
-              <div 
-                key={i}
-                className="hero-icon animate-float"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  animationDuration: `${15 + Math.random() * 10}s`,
-                  fontSize: `${1 + Math.random() * 1.5}rem`,
-                  opacity: 0.2
-                }}
-              >
-                {['🍕', '🍲', '🍝', '🍜', '🍗', '🍰', '🥗'][Math.floor(Math.random() * 7)]}
-              </div>
-            ))}
-          </div>
+          <AnimatedFoodIconsBackground count={45} />
         </div>
 
         <motion.div 

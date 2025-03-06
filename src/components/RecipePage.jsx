@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ImageComponent from './ImageComponent';
 import CommentsSection from './CommentsSection';
 import SuggestionsSection from './SuggestionsSection';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
 
 // RecipePage component
 const RecipePage = ({ 
@@ -19,6 +20,7 @@ const RecipePage = ({
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const navigate = useNavigate();
+  const { theme } = useTheme();
   
   // Calculate stars based on rating
   const totalStars = 5;
@@ -95,7 +97,8 @@ const RecipePage = ({
     return (
       <button 
         onClick={() => navigate(`/search?category=${label.toLowerCase()}&value=${value.toLowerCase()}`)}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-full mr-2 transition-transform duration-200 hover:scale-105 cursor-pointer"
+        className="px-3 py-2 rounded-full mr-2 mb-2 transition-transform duration-200 hover:scale-105 cursor-pointer hover:brightness-80"
+        style={{backgroundColor: theme.core.container, color: theme.text }}
       >
         <span className="font-semibold">{label}:</span> {value}
       </button>
@@ -107,7 +110,8 @@ const RecipePage = ({
   };
   
   return (
-    <div className="w-full min-h-screen bg-gray-300">
+    <div  className="w-full min-h-screen bg-gray-300"
+          style={{ backgroundColor:theme.core.background, color: theme.core.text}}>
       {/* Image */}
       <ImageComponent headerImage={headerImage}></ImageComponent><br />
       
@@ -123,22 +127,28 @@ const RecipePage = ({
       </div><br />
       
       {/* Recipe Title */}
-      <div className="w-16/20 mx-auto bg-red-900 text-white p-6 text-3xl font-bold text-center rounded-full">
+      <div
+        className="w-16/20 mx-auto p-6 text-3xl font-bold text-center rounded-full"
+        style={{ backgroundColor:theme.core.container, color: theme.text }}>
         {title}
       </div>
       
       {/* Recipe Stats */}
       <div className="flex flex-wrap justify-center gap-2 py-3 bg-white-100">
         {/* Rating */}
-        <div className="bg-red-900 text-white px-3 py-2 rounded-full flex items-center gap-1">
-          <span className="font-bold">{rating}/{totalStars}</span>
+        <div 
+          className="px-3 py-2 rounded-full flex items-center gap-1"
+          style={{ backgroundColor:theme.core.container, color: theme.text }}>
+          <span className="font-bold" >{rating}/{totalStars}</span>
           <div className="flex">
             {renderStars()}
           </div>
         </div>
         
         {/* Servings */}
-        <div className="bg-red-900 text-white px-3 py-2 rounded-full flex items-center gap-2">
+        <div 
+          className="px-3 py-2 rounded-full flex items-center gap-2"
+          style={{ backgroundColor:theme.core.container, color: theme.text }}>
           {/* Custom SVG Icon from SVGRepo */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +165,9 @@ const RecipePage = ({
 
         
         {/* Time */}
-        <div className="bg-red-900 text-white px-3 py-2 rounded-full flex items-center gap-2">
+        <div 
+          className="px-3 py-2 rounded-full flex items-center gap-2"
+          style={{ backgroundColor:theme.core.container, color: theme.text }}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -165,7 +177,8 @@ const RecipePage = ({
         {/* Comments */}
         <button 
           onClick={scrollToComments}
-          className="bg-red-900 hover:bg-red-700 text-white px-3 py-2 rounded-full flex items-center gap-2 transition duration-200 cursor-pointer"
+          className="hover:brightness-80 px-3 py-2 rounded-full flex items-center gap-2 transition duration-200 cursor-pointer"
+          style={{ backgroundColor:theme.core.container, color: theme.text }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -176,8 +189,9 @@ const RecipePage = ({
         {/* Bookmark */}
         <button
           onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`${isBookmarked ? 'bg-black' : 'bg-red-900'} hover:bg-red-700 text-white p-2 rounded-full flex items-center justify-center transition duration-200 cursor-pointer`}
+          className={`${isBookmarked ? 'bg-black' : 'bg-red-900'} ${isBookmarked ? 'brightness-60' : 'brightness-100'} hover:brightness-80 p-2 rounded-full flex items-center justify-center transition duration-200 cursor-pointer`}
           aria-label={isBookmarked ? "Remove from favorites" : "Add to favorites"}
+          style={{ backgroundColor:theme.core.container, color: theme.text }}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isBookmarked ? 0 : 2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -186,11 +200,12 @@ const RecipePage = ({
       </div><br />
       
       {/* Recipe Content */}
-      <div className="w-19/20 mx-auto rounded-[40px] bg-red-900 text-white p-[48px] grid grid-cols-1 md:grid-cols-5 gap-8">
+      <div  className="w-19/20 mx-auto rounded-[40px] p-[48px] grid grid-cols-1 md:grid-cols-5 gap-8"
+            style={{ backgroundColor:theme.core.container, color: theme.text }}>
         
         {/* Instructions*/}
         <div className="md:col-span-4">
-          <h2 className="text-yellow-400 text-4xl font-bold mb-4">Instructions</h2>
+          <h2 className="text-4xl font-bold mb-4">Instructions</h2>
           {instructions.map((step, index) => (
             <div key={index} className="mb-6">
               <h3 className="text-2xl font-semibold mb-2">Step {index + 1}</h3>
@@ -202,7 +217,7 @@ const RecipePage = ({
 
         {/* Ingredients and Tags */}
         <div className="md:col-span-1">
-          <h2 className="text-yellow-400 text-3xl font-bold mb-4">Ingredients</h2>
+          <h2 className="text-3xl font-bold mb-4">Ingredients</h2>
           <ul className="mb-10 space-y-2">
             {ingredients.map((ingredient, index) => (
               <li key={index} className="flex items-baseline">
@@ -212,7 +227,7 @@ const RecipePage = ({
             ))}
           </ul>
 
-          <h2 className="text-yellow-400 text-3xl font-bold mb-4">Tags</h2>
+          <h2 className="text-3xl font-bold mb-4">Tags</h2>
           <ul className="space-y-2">
             {tags.map((tag, index) => (
               <li key={index} className="flex items-baseline">

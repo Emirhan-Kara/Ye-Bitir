@@ -1,43 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  /* Default theme variables (light mode) */
-  --color-primary: #c0392b;
-  --color-primary-hover: #a82315;
-  --color-secondary: #34495e;
-  --color-secondary-hover: #2c3e50;
-  --color-background: #f8f8f8;
-  --color-background-alt: #e2ece0;
-  --color-header-footer: #cfd8dc;
-  --color-card-background: #ffffff;
+  /* Recipe Card variables */
+  --color-recipe-card-background: #e2ece0;    /* mint-green */
+  --color-recipe-card-text: #34495e;          /* dark blue */
+  --color-recipe-card-component: #34495e;     /* dark blue */
+  --color-recipe-card-component-text: #e0e0e0; /* white */
   
-  --color-text-primary: #34495e;
-  --color-text-secondary: #707070;
-  --color-text-light: #ffffff;
-  --color-text-link: #c0392b;
-  --color-text-link-hover: #a82315;
+  /* Header/Footer variables */
+  --color-header-footer-text: #606060;          /* dark gray */
+  --color-header-footer-logo-red: #82261b;      /* dark-red */
+  --color-header-footer-background: #cfd8dc;    /* light gray */
+  --color-header-footer-component-bg: #e0e0e0;  /* white */
+  --color-header-footer-search-box: #e2ece0;    /* mint-green */
   
-  --color-button-primary: #c0392b;
-  --color-button-primary-hover: #a82315;
-  --color-button-secondary: #34495e;
-  --color-button-secondary-hover: #2c3e50;
-  --color-button-text: #ffffff;
-  
-  --color-input-background: #ffffff;
-  --color-input-border: #e2e8f0;
-  --color-input-focus: #c0392b;
-  
-  --color-panel-recipe: #e2ece0;
-  --color-panel-info: #34495e;
-  --color-panel-warning: #f39c12;
-  --color-panel-danger: #e74c3c;
-  
-  --color-feature-suggestions: #831010;
-  --color-feature-suggestions-text: #ffd700;
+  /* Core theme variables */
+  --color-core-background: #e0e0e0;    /* white */
+  --color-core-container: #e2ece0;     /* mint-green */
+  --color-core-container-hover: #9eb29a; /* darker mint-green */
+  --color-core-text: #34495e;          /* dark blue */
 }
-
-/* These CSS variables will be set dynamically in ThemeContext.jsx */
-/* The :root rules above serve as defaults for the light theme */
 
 body {
   margin: 0;
@@ -46,8 +28,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
+  background-color: var(--color-core-background);
+  color: var(--color-core-text);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -57,69 +39,44 @@ a, button, input, select, textarea {
 }
 
 /* Theme utility classes */
-.bg-theme-primary {
-  background-color: var(--color-primary);
+.bg-recipe-card {
+  background-color: var(--color-recipe-card-background);
 }
-.bg-theme-secondary {
-  background-color: var(--color-secondary);
+.text-recipe-card {
+  color: var(--color-recipe-card-text);
 }
-.bg-theme-background {
-  background-color: var(--color-background);
+.bg-recipe-component {
+  background-color: var(--color-recipe-card-component);
 }
-.bg-theme-card {
-  background-color: var(--color-card-background);
-}
-.bg-theme-header-footer {
-  background-color: var(--color-header-footer);
+.text-recipe-component {
+  color: var(--color-recipe-card-component-text);
 }
 
-.text-theme-primary {
-  color: var(--color-text-primary);
+.bg-header-footer {
+  background-color: var(--color-header-footer-background);
 }
-.text-theme-secondary {
-  color: var(--color-text-secondary);
+.text-header-footer {
+  color: var(--color-header-footer-text);
 }
-.text-theme-light {
-  color: var(--color-text-light);
+.text-logo-red {
+  color: var(--color-header-footer-logo-red);
 }
-.text-theme-link {
-  color: var(--color-text-link);
+.bg-header-component {
+  background-color: var(--color-header-footer-component-bg);
 }
-.hover\:text-theme-link-hover:hover {
-  color: var(--color-text-link-hover);
-}
-
-.border-theme-primary {
-  border-color: var(--color-primary);
-}
-.border-theme-secondary {
-  border-color: var(--color-secondary);
+.bg-search-box {
+  background-color: var(--color-header-footer-search-box);
 }
 
-.btn-theme-primary {
-  background-color: var(--color-button-primary);
-  color: var(--color-button-text);
+.bg-core {
+  background-color: var(--color-core-background);
 }
-.btn-theme-primary:hover {
-  background-color: var(--color-button-primary-hover);
+.bg-container {
+  background-color: var(--color-core-container);
 }
-.btn-theme-secondary {
-  background-color: var(--color-button-secondary);
-  color: var(--color-button-text);
+.text-core {
+  color: var(--color-core-text);
 }
-.btn-theme-secondary:hover {
-  background-color: var(--color-button-secondary-hover);
-}
-
-/* Recipe-specific theme classes */
-.recipe-card {
-  background-color: var(--color-panel-recipe);
-}
-.recipe-info {
-  background-color: var(--color-panel-info);
-}
-
-/* Dark mode specific overrides can be added here if needed */
-body.dark-mode {
-  /* These are set dynamically by ThemeContext, but you can add additional styles here */
+.hover\:bg-container-hover:hover {
+  background-color: var(--color-core-container-hover);
 }

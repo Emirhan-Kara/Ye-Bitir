@@ -7,19 +7,18 @@ const ThemeToggle = ({ className = '' }) => {
 
   return (
     <div className={`flex items-center ${className}`}>
-      <span className="mr-2 text-sm font-medium">
+      <span 
+        className="mr-2 text-sm font-medium"
+        style={{ color: theme.headerfooter.text }}
+      >
         {isDark ? 'Dark' : 'Light'} Mode
       </span>
       <button
         onClick={toggleTheme}
-        className={`
-          w-14 h-7 rounded-full p-1 transition-colors duration-300 focus:outline-none
-          ${isDark ? 'bg-gray-700' : 'bg-gray-300'}
-        `}
+        className="w-14 h-7 rounded-full p-1 transition-colors duration-300 focus:outline-none"
         style={{
-          backgroundColor: isDark ? theme.colors.secondary : '#e2e8f0'
+          backgroundColor: isDark ? theme.headerfooter.componentBg : theme.core.container
         }}
-        aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       >
         <div
           className={`

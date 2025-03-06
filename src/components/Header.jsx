@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Home, UtensilsCrossed, Shuffle, Info, FilePlus, User, LogIn } from 'lucide-react';
+import { Search, Home, UtensilsCrossed, Shuffle, Info, FilePlus, User, LogIn, Menu } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 
@@ -12,18 +12,12 @@ const Header = ({
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Safely destructure theme with default
-  const { theme = { 
-    colors: { 
-      headerFooter: '#cfd8dc', 
-      primary: '#c0392b',
-      secondary: '#34495e',
-      text: { primary: '#000', light: '#fff' }
-    } 
-  }, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -37,10 +31,16 @@ const Header = ({
       }
     };
     
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
     window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
     };
   }, [lastScrollY, scrollThreshold]);
 
@@ -56,201 +56,175 @@ const Header = ({
     if (searchQuery.trim()) {
       setSearchQuery('');
       navigate(`/recipes`);
+      setIsSearchVisible(false);
     }
   };
 
+  // Navigation items
+  const navItems = [
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/recipes', label: 'Recipes', icon: UtensilsCrossed },
+    { path: '/recipe-wheel', label: 'Recipe Wheel', icon: Shuffle },
+    { path: '/about', label: 'About Us', icon: Info },
+    { path: '/add-recipe', label: 'Add Recipe', icon: FilePlus },
+  ];
+
   return (
     <header 
-      className={`text-white p-4 pl-8 pr-8 w-full fixed top-0 z-50 ${
+      className={`px-2 sm:px-3 md:px-6 lg:px-8 py-2 md:py-3 w-full fixed top-0 z-50 ${
         isVisible 
           ? 'translate-y-0 shadow-md' 
           : '-translate-y-full'
       } transition-all duration-500 ease-in-out`}
       style={{ 
-        backgroundColor: theme.colors.headerFooter,
-        color: theme.colors.text.light 
+        backgroundColor: theme.headerfooter.background,
+        color: theme.headerfooter.text 
       }}
     >
-      <div className="grid grid-cols-12 gap-4 items-center">
-        {/* Column 1: Logo */}
-        <div className="col-span-1 flex items-center">
+      <div className="flex flex-wrap items-center justify-between">
+        {/* Logo and Theme Toggle - Always visible */}
+        <div className="flex items-center space-x-3">
+          {/* Logo */}
           <Link to="/" className="flex flex-col items-center">
             <span 
               className="font-bold text-xl" 
-              style={{ color: theme.colors.text.primary }}
+              style={{ color: theme.headerfooter.logoRed }}
             >
               Ye
             </span>
             <span 
               className="font-bold text-xl" 
-              style={{ color: theme.colors.primary }}
+              style={{ color: theme.core.text }}
             >
               Bitir
             </span>
           </Link>
+          
+          {/* Theme Toggle */}
+          <div className="ml-2">
+            <ThemeToggle />
+          </div>
         </div>
 
-        {/* Theme Toggle */}
-        <div className="col-span-1">
-          <ThemeToggle />
-        </div>
-
-        {/* Rest of the header content */}
+        {/* Search - Collapsible on small screens, visible on larger screens */}
         {!isHomepage && (
-          <div className="col-span-5 flex items-center pr-16">
-            <form onSubmit={handleSearch} className="relative w-full flex">
+          <div className={`${isSearchVisible ? 'flex' : 'hidden'} md:flex w-full md:w-auto order-3 md:order-2 mt-3 md:mt-0`}>
+            <form onSubmit={handleSearch} className="relative flex w-full md:w-auto">
               <div className="relative flex-grow">
                 <input 
                   type="text" 
                   placeholder="Search recipes..." 
-                  className="w-full p-2 rounded-l-lg pl-10"
+                  className="w-full p-2 rounded-l-lg pl-8 text-sm"
                   style={{
-                    backgroundColor: theme.colors.input.background,
-                    color: theme.colors.text.primary,
-                    borderColor: theme.colors.input.border
+                    backgroundColor: theme.headerfooter.searchBox,
+                    color: theme.core.text,
+                    borderColor: theme.headerfooter.componentBg
                   }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
                 <Search 
-                  className="absolute left-3 top-2.5" 
-                  size={16} 
-                  color={theme.colors.text.primary} 
+                  className="absolute left-2 top-2.5" 
+                  size={14} 
+                  color={theme.core.text} 
                 />
               </div>
               <button 
                 type="submit" 
-                className="px-4 py-2 rounded-r-lg transition-colors cursor-pointer"
+                className="px-3 py-2 rounded-r-lg transition-colors cursor-pointer"
                 style={{
-                  backgroundColor: theme.colors.button.primary,
-                  color: theme.colors.button.text,
+                  backgroundColor: theme.headerfooter.logoRed,
+                  color: theme.recipecard.componentText,
                 }}
                 aria-label="Search"
               >
-                <Search size={16} color={theme.colors.button.text} />
+                <Search size={14} color={theme.recipecard.componentText} />
               </button>
             </form>
           </div>
         )}
-        
-        {isHomepage && <div className="col-span-5"></div>}
 
-        {/* Navigation Buttons */}
-        <div className="col-span-5 flex justify-between items-center">
-          {/* Home */}
-          <Link to="/" className="flex flex-col items-center pt-1 no-underline">
-            <Home 
-              size={24} 
-              color={isActiveRoute('/') ? theme.colors.primary : theme.colors.text.primary} 
-            />
-            <span 
-              className={`text-sm pt-1 ${
-                isActiveRoute('/') 
-                  ? `font-bold text-[${theme.colors.primary}]`
-                  : `text-[${theme.colors.text.primary}]`
-              }`}
-            >
-              Home
-            </span>
-          </Link>
-          
-          {/* Recipes */}
-          <Link to="/recipes" className="flex flex-col items-center pt-1 no-underline">
-            <UtensilsCrossed 
-              size={24} 
-              color={isActiveRoute('/recipes') ? theme.colors.primary : theme.colors.text.primary} 
-            />
-            <span 
-              className={`text-sm pt-1 ${
-                isActiveRoute('/recipes') 
-                  ? `font-bold text-[${theme.colors.primary}]`
-                  : `text-[${theme.colors.text.primary}]`
-              }`}
-            >
-              Recipes
-            </span>
-          </Link>
-          
-          {/* Recipe Wheel */}
-          <Link to="/recipe-wheel" className="flex flex-col items-center pt-1 no-underline">
-            <Shuffle 
-              size={24} 
-              color={isActiveRoute('/recipe-wheel') ? theme.colors.primary : theme.colors.text.primary} 
-            />
-            <span 
-              className={`text-sm pt-1 ${
-                isActiveRoute('/recipe-wheel') 
-                  ? `font-bold text-[${theme.colors.primary}]`
-                  : `text-[${theme.colors.text.primary}]`
-              }`}
-            >
-              Recipe Wheel
-            </span>
-          </Link>
-          
-          {/* About Us */}
-          <Link to="/about" className="flex flex-col items-center pt-1 no-underline">
-            <Info 
-              size={24} 
-              color={isActiveRoute('/about') ? theme.colors.primary : theme.colors.text.primary} 
-            />
-            <span 
-              className={`text-sm pt-1 ${
-                isActiveRoute('/about') 
-                  ? `font-bold text-[${theme.colors.primary}]`
-                  : `text-[${theme.colors.text.primary}]`
-              }`}
-            >
-              About Us
-            </span>
-          </Link>
-          
-          {/* Add Recipe */}
-          <Link to="/add-recipe" className="flex flex-col items-center pt-1 no-underline">
-            <FilePlus 
-              size={24} 
-              color={isActiveRoute('/add-recipe') ? theme.colors.primary : theme.colors.text.primary} 
-            />
-            <span 
-              className={`text-sm pt-1 ${
-                isActiveRoute('/add-recipe') 
-                  ? `font-bold text-[${theme.colors.primary}]`
-                  : `text-[${theme.colors.text.primary}]`
-              }`}
-            >
-              Add Recipe
-            </span>
-          </Link>
-          
-          {/* Profile/Login */}
-          <Link 
-            to={isLoggedIn ? "/profile" : "/login"} 
-            className="flex flex-col items-center no-underline"
+        {/* Mobile search toggle */}
+        {!isHomepage && (
+          <button 
+            className="md:hidden order-2 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-200"
+            onClick={() => setIsSearchVisible(!isSearchVisible)}
+            aria-label="Toggle search"
           >
-            <div 
-              className="p-2 rounded-full transition-colors"
-              style={{
-                backgroundColor: isActiveRoute(isLoggedIn ? '/profile' : '/login') 
-                  ? theme.colors.button.primary 
-                  : theme.colors.button.secondary
-              }}
+            <Search size={20} color={theme.headerfooter.text} />
+          </button>
+        )}
+
+        {/* Navigation - Horizontal scrolling on small screens */}
+        <div className="order-4 md:order-3 w-full md:w-auto mt-2 md:mt-0 overflow-x-auto hide-scrollbar">
+          <div className="flex space-x-1 sm:space-x-2 md:space-x-4 lg:space-x-6 py-1 min-w-max">
+            {navItems.map((item) => (
+              <Link 
+                key={item.path}
+                to={item.path} 
+                className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap"
+              >
+                <item.icon 
+                  size={windowWidth < 768 ? 20 : 24} 
+                  className="sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-6 lg:h-6"
+                  color={isActiveRoute(item.path) ? theme.headerfooter.logoRed : theme.headerfooter.text} 
+                />
+                <span 
+                  className={`text-xs sm:text-sm md:text-sm lg:text-sm pt-1 ${isActiveRoute(item.path) ? 'font-bold' : ''}`}
+                  style={{ 
+                    color: isActiveRoute(item.path) 
+                      ? theme.headerfooter.logoRed
+                      : theme.headerfooter.text
+                  }}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            ))}
+            
+            {/* Profile/Login */}
+            <Link 
+              to={isLoggedIn ? "/profile" : "/login"} 
+              className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap"
             >
-              {isLoggedIn ? (
-                <User size={18} color={theme.colors.button.text} />
-              ) : (
-                <LogIn size={18} color={theme.colors.button.text} />
-              )}
-            </div>
-            <span 
-              className="text-sm"
-              style={{ color: theme.colors.primary }}
-            >
-              {isLoggedIn ? "Profile" : "Login"}
-            </span>
-          </Link>
+              <div 
+                className="p-1 rounded-full transition-colors"
+                style={{
+                  backgroundColor: isActiveRoute(isLoggedIn ? '/profile' : '/login') 
+                    ? theme.headerfooter.logoRed 
+                    : theme.headerfooter.componentBg
+                }}
+              >
+                {isLoggedIn ? (
+                  <User size={windowWidth < 768 ? 16 : 18} className="sm:w-5 sm:h-5 md:w-5 md:h-5 lg:w-5 lg:h-5" color={theme.headerfooter.text} />
+                ) : (
+                  <LogIn size={windowWidth < 768 ? 16 : 18} className="sm:w-5 sm:h-5 md:w-5 md:h-5 lg:w-5 lg:h-5" color={theme.core.text} />
+                )}
+              </div>
+              <span 
+                className="text-xs"
+                style={{ color: theme.headerfooter.logoRed }}
+              >
+                {isLoggedIn ? "Profile" : "Login"}
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
+
+      {/* Custom scrollbar hiding styles */}
+      <style>
+        {`
+          .hide-scrollbar {
+            -ms-overflow-style: none;  /* Internet Explorer and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari, and Opera */
+          }
+        `}
+      </style>
     </header>
   );
 };

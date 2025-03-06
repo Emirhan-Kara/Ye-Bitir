@@ -9,8 +9,8 @@ const Footer = () => {
     <footer 
       className="w-full py-6 px-4"
       style={{ 
-        backgroundColor: theme.colors.headerFooter,
-        color: theme.colors.text.primary 
+        backgroundColor: theme.headerfooter.background,
+        color: theme.headerfooter.text 
       }}
     >
       <div className="w-19/20 container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -20,13 +20,13 @@ const Footer = () => {
             <h2 className="text-3xl font-bold">
               <span 
                 className="text-xl" 
-                style={{ color: theme.colors.text.primary }}
+                style={{ color: theme.headerfooter.text }}
               >
                 Ye
               </span>
               <span 
                 className="text-xl" 
-                style={{ color: theme.colors.primary }}
+                style={{ color: theme.headerfooter.logoRed }}
               >
                 Bitir
               </span>
@@ -34,7 +34,7 @@ const Footer = () => {
           </div>
           <p 
             className="text-sm"
-            style={{ color: theme.colors.text.secondary }}
+            style={{ color: theme.headerfooter.text }}
           >
             Ye-Bitir is a user-friendly recipe app offering diverse
             cuisines, step-by-step cooking guides, meal planning,
@@ -46,7 +46,7 @@ const Footer = () => {
         <div className="flex flex-col">
           <h3 
             className="text-xl font-semibold mb-4 text-center"
-            style={{ color: theme.colors.text.primary }}
+            style={{ color: theme.headerfooter.text }}
           >
             Quick Contact
           </h3>
@@ -55,17 +55,17 @@ const Footer = () => {
               <div 
                 className="p-2 rounded-full w-10 h-10 flex items-center justify-center mr-3"
                 style={{ 
-                  backgroundColor: theme.colors.input.background,
+                  backgroundColor: theme.headerfooter.componentBg,
                 }}
               >
                 <Mail 
                   size={18} 
-                  color={theme.colors.text.primary} 
+                  color={theme.headerfooter.text} 
                 />
               </div>
               <span 
                 className="text-sm"
-                style={{ color: theme.colors.text.secondary }}
+                style={{ color: theme.headerfooter.text }}
               >
                 yebitir@gmail.com
               </span>
@@ -74,17 +74,17 @@ const Footer = () => {
               <div 
                 className="p-2 rounded-full w-10 h-10 flex items-center justify-center mr-3"
                 style={{ 
-                  backgroundColor: theme.colors.input.background,
+                  backgroundColor: theme.headerfooter.componentBg,
                 }}
               >
                 <Phone 
                   size={18} 
-                  color={theme.colors.text.primary} 
+                  color={theme.headerfooter.text} 
                 />
               </div>
               <span 
                 className="text-sm"
-                style={{ color: theme.colors.text.secondary }}
+                style={{ color: theme.headerfooter.text }}
               >
                 +90 500 000 00 00
               </span>
@@ -96,7 +96,7 @@ const Footer = () => {
         <div className="flex flex-col text-sm">
           <div 
             className="mb-2"
-            style={{ color: theme.colors.text.secondary }}
+            style={{ color: theme.headerfooter.text }}
           >
             © 2025 Ye-Bitir. Created by Zaid, Emirhan, Hayrunnisa,
             and Rumeysa.
@@ -114,8 +114,7 @@ const Footer = () => {
                   href={link.href} 
                   className="hover:underline mx-1"
                   style={{ 
-                    color: theme.colors.text.link,
-                    ':hover': { color: theme.colors.text.linkHover }
+                    color: theme.headerfooter.logoRed,
                   }}
                 >
                   {link.text}

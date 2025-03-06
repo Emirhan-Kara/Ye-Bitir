@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import './RecipeWheel.css'; // This now contains all our CSS
 
 const RecipeWheel = () => {
+  const { theme } = useTheme();
   // Navigation
   const navigate = useNavigate();
   
@@ -142,25 +145,38 @@ const RecipeWheel = () => {
     }
   };
   
+  // Wheel segment colors
+  const wheelSegments = [
+    { color: '#ef4444' }, // Red
+    { color: '#f97316' }, // Orange
+    { color: '#f59e0b' }, // Amber
+    { color: '#84cc16' }, // Lime
+    { color: '#10b981' }, // Emerald
+    { color: '#06b6d4' }  // Cyan
+  ];
+  
   return (
-    <div className="min-h-screen bg-gray-300 py-8 px-4">
+    <div className="min-h-screen py-8 px-4"
+         style={{ color: theme.core.text }}>
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-red-800 mb-8 text-center">Recipe Wheel</h1>
-        <p className="text-xl text-gray-700 mb-8 text-center">
+        <h1 className="edgy-title text-center mb-8 spin-in">RECIPE WHEEL</h1>
+        <p className="text-xl mb-8 text-center fade-in-up">
           Select your preferences and spin the wheel to discover your next meal!
         </p>
         
         {/* Filter selectors */}
-        <div className="bg-red-900 rounded-2xl p-6 mb-8">
+        <div className="filter-container rounded-2xl p-6 mb-8 shadow-lg"
+             style={{ backgroundColor: theme.core.container, color: theme.core.text }}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Cuisine */}
             <div className="flex flex-col">
-              <label className="text-yellow-400 font-semibold mb-2">Cuisine:</label>
+              <label className="font-semibold mb-2">Cuisine:</label>
               <select 
                 name="cuisine"
                 value={filters.cuisine}
                 onChange={handleFilterChange}
-                className="p-2 rounded-lg bg-white text-gray-900"
+                className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer"
+                style={{ backgroundColor: theme.core.containerHoover}}
               >
                 {filterOptions.cuisine.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -170,12 +186,13 @@ const RecipeWheel = () => {
             
             {/* Meal Type */}
             <div className="flex flex-col">
-              <label className="text-yellow-400 font-semibold mb-2">Meal Type:</label>
+              <label className="font-semibold mb-2">Meal Type:</label>
               <select 
                 name="mealType"
                 value={filters.mealType}
                 onChange={handleFilterChange}
-                className="p-2 rounded-lg bg-white text-gray-900"
+                className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer"
+                style={{ backgroundColor: theme.core.containerHoover}}
               >
                 {filterOptions.mealType.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -185,12 +202,13 @@ const RecipeWheel = () => {
             
             {/* Diet */}
             <div className="flex flex-col">
-              <label className="text-yellow-400 font-semibold mb-2">Diet:</label>
+              <label className="font-semibold mb-2">Diet:</label>
               <select 
                 name="diet"
                 value={filters.diet}
                 onChange={handleFilterChange}
-                className="p-2 rounded-lg bg-white text-gray-900"
+                className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer"
+                style={{ backgroundColor: theme.core.containerHoover}}
               >
                 {filterOptions.diet.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -200,12 +218,13 @@ const RecipeWheel = () => {
             
             {/* Main Ingredient */}
             <div className="flex flex-col">
-              <label className="text-yellow-400 font-semibold mb-2">Main Ingredient:</label>
+              <label className="font-semibold mb-2">Main Ingredient:</label>
               <select 
                 name="mainIngredient"
                 value={filters.mainIngredient}
                 onChange={handleFilterChange}
-                className="p-2 rounded-lg bg-white text-gray-900"
+                className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer" 
+                style={{ backgroundColor: theme.core.containerHoover}}
               >
                 {filterOptions.mainIngredient.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -219,7 +238,11 @@ const RecipeWheel = () => {
             <button 
               onClick={handleSpin}
               disabled={isSpinning}
-              className="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 px-8 rounded-full text-lg transform transition hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`flame-button cursor-pointer font-bold py-3 px-8 rounded-full text-lg ${!isSpinning && !showRecipe ? 'pulse' : ''}`}
+              style={{ 
+                backgroundColor: theme.core.containerHoover,
+                color: theme.core.text,
+              }}
             >
               {showRecipe ? "Spin Again" : "Spin the Wheel"}
             </button>
@@ -227,45 +250,54 @@ const RecipeWheel = () => {
         </div>
         
         {/* Wheel and Recipe Display */}
-        <div className="flex justify-center items-center flex-col">
+        <div className="wheel-container flex justify-center items-center flex-col">
           {/* Wheel Animation - only show when not displaying a recipe */}
           {!showRecipe && (
             <div className="w-64 h-64 relative mb-8">
               <div 
                 ref={wheelRef} 
-                className="w-full h-full rounded-full border-8 border-yellow-600 bg-red-900 relative"
+                className="wheel w-full h-full rounded-full relative overflow-hidden shadow-xl"
                 style={{
                   transformOrigin: 'center center',
+                  border: `8px solid ${theme.core.text}`,
+                  boxShadow: `0 0 20px rgba(0, 0, 0, 0.5), 0 0 30px ${theme.headerfooter.logoRed}40`
                 }}
               >
-                {/* Wheel segments */}
-                {Array.from({ length: 8 }).map((_, index) => (
+                {/* Colored wheel segments instead of lines */}
+                {wheelSegments.map((segment, index) => (
                   <div 
                     key={index}
-                    className="absolute top-0 left-1/2 h-1/2 w-0.5 bg-yellow-400"
+                    className="wheel-segment absolute w-1/2 h-1/2 top-0 left-1/2"
                     style={{
-                      transform: `rotate(${index * 45}deg)`,
-                      transformOrigin: 'bottom center',
+                      backgroundColor: segment.color,
+                      transform: `rotate(${index * 60}deg)`,
+                      transformOrigin: 'bottom left',
+                      clipPath: 'polygon(0 0, 100% 0, 0 100%)'
                     }}
                   />
                 ))}
-                
-                {/* Center of wheel */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-400 rounded-full"></div>
               </div>
               
               {/* Triangle pointer */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-yellow-600"></div>
+              <div className="wheel-pointer absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+                <div 
+                  className="w-0 h-0"
+                  style={{
+                    borderLeft: '15px solid transparent',
+                    borderRight: '15px solid transparent',
+                    borderBottom: `30px solid ${theme.headerfooter.logoRed}`,
+                    filter: `drop-shadow(0 0 5px ${theme.headerfooter.logoRed})`
+                  }}
+                ></div>
               </div>
             </div>
           )}
           
           {/* Recipe Card Display - with zoom in animation when recipe is selected */}
           {showRecipe && selectedRecipe && (
-            <div className="transition-all duration-500 transform scale-100 hover:scale-105 mb-8">
+            <div className="recipe-card-container transition-all duration-500 transform scale-100 hover:scale-105 mb-8 fade-in-up">
               {/* Wrap in larger container for styling and transitions */}
-              <div className="p-4 bg-white rounded-xl shadow-xl">
+              <div className="recipe-card p-4 rounded-xl shadow-xl" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
                 <RecipeCard
                   title={selectedRecipe.title}
                   image={selectedRecipe.image}
@@ -278,7 +310,12 @@ const RecipeWheel = () => {
                 <div className="mt-4 flex justify-center">
                   <button 
                     onClick={viewRecipeDetails}
-                    className="bg-red-800 hover:bg-red-700 text-white py-2 px-6 rounded-lg transition-colors"
+                    className="recipe-button cursor-pointer py-2 px-6 rounded-lg"
+                    style={{
+                      backgroundColor: theme.recipecard.component, 
+                      color: theme.recipecard.componentText,
+                      boxShadow: `0 4px 6px ${theme.headerfooter.logoRed}30`
+                    }}
                   >
                     View Recipe Details
                   </button>

@@ -12,6 +12,7 @@ import ProfilePage from './ProfilePage';
 import AboutUs from './AboutUs';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import AddRecipePage from './AddRecipePage';
+import SearchPage from './SearchPage';
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -230,18 +231,18 @@ const Home = () => {
       {/* Hero section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">
-          <span style={{ color: theme.colors.text.primary }}> Welcome to </span>
-          <span style={{ color: theme.colors.primary }}>Ye</span>
-          <span style={{ color: theme.colors.text.primary }}> Bitir</span>
+          <span style={{ color: theme.core.text }}> Welcome to </span>
+          <span style={{ color: theme.headerfooter.logoRed }}>Ye</span>
+          <span style={{ color: theme.core.text }}> Bitir</span>
         </h1>
-        <p className="text-xl max-w-3xl mx-auto" style={{ color: theme.colors.text.secondary }}>
+        <p className="text-xl max-w-3xl mx-auto" style={{ color: theme.core.text, opacity: 0.7 }}>
           Discover amazing recipes from around the world, share your own creations, and connect with food lovers.
         </p>
       </div>
       
       {/* Featured recipes section */}
       <div className="mb-12">
-        <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: theme.colors.text.primary }}>
+        <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: theme.core.text }}>
           Featured Recipes
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
@@ -291,7 +292,7 @@ const StandardLayout = () => {
   const { theme } = useTheme();
   
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.colors.background }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.core.background }}>
       {/* Header - isHomepage is true only when on home page */}
       <Routes>
         <Route path="/" element={<Header isHomepage={true} isLoggedIn={true} />} />
@@ -303,23 +304,10 @@ const StandardLayout = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
-          <Route path="/search" element={
-            <div className="container mx-auto py-8">
-              <h1 className="text-3xl font-bold" style={{ color: theme.colors.primary }}>Search page</h1>
-            </div>
-          } />
+          <Route path="/search" element={<SearchPage /> } />
           <Route path="/recipe-wheel" element={<RecipeWheel />} />
-          <Route path="/recipes" element={
-            <div className="container mx-auto py-8">
-              <h1 className="text-3xl font-bold" style={{ color: theme.colors.primary }}>Search page</h1>
-            </div>
-          } />
+          <Route path="/recipes" element={<SearchPage /> } />
           <Route path="/about" element={<AboutUs></AboutUs>} />
-          <Route path="/add-recipe" element={
-            <div className="container mx-auto py-8">
-              <h1 className="text-3xl font-bold" style={{ color: theme.colors.primary }}>Add Recipe</h1>
-            </div>
-          } />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/add-recipe" element={<AddRecipePage />} />
           <Route path="/profile/settings" element={<ProfilePage initialTab="settings" />} />

@@ -132,7 +132,7 @@ const Header = ({
               </div>
               <button 
                 type="submit" 
-                className="px-3 py-2 rounded-r-lg transition-colors cursor-pointer"
+                className="px-3 py-2 rounded-r-lg transition-colors cursor-pointer hover:brightness-110 transform hover:scale-105 transition-transform duration-200"
                 style={{
                   backgroundColor: theme.headerfooter.logoRed,
                   color: theme.recipecard.componentText,
@@ -148,7 +148,7 @@ const Header = ({
         {/* Mobile search toggle */}
         {!isHomepage && (
           <button 
-            className="md:hidden order-2 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-200"
+            className="md:hidden order-2 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-200 transform hover:scale-110 transition-transform duration-200"
             onClick={() => setIsSearchVisible(!isSearchVisible)}
             aria-label="Toggle search"
           >
@@ -163,13 +163,15 @@ const Header = ({
               <Link 
                 key={item.path}
                 to={item.path} 
-                className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap"
+                className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap group transform hover:scale-110 transition-transform duration-200"
               >
-                <item.icon 
-                  size={windowWidth < 768 ? 20 : 24} 
-                  className="sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-6 lg:h-6"
-                  color={isActiveRoute(item.path) ? theme.headerfooter.logoRed : theme.headerfooter.text} 
-                />
+                <div className="p-1 rounded-full transition-colors group-hover:bg-opacity-20 group-hover:bg-gray-400">
+                  <item.icon 
+                    size={windowWidth < 768 ? 20 : 24} 
+                    className="sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-6 lg:h-6"
+                    color={isActiveRoute(item.path) ? theme.headerfooter.logoRed : theme.headerfooter.text} 
+                  />
+                </div>
                 <span 
                   className={`text-xs sm:text-sm md:text-sm lg:text-sm pt-1 ${isActiveRoute(item.path) ? 'font-bold' : ''}`}
                   style={{ 
@@ -186,25 +188,30 @@ const Header = ({
             {/* Profile/Login */}
             <Link 
               to={isLoggedIn ? "/profile" : "/login"} 
-              className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap"
+              className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap group transform hover:scale-110 transition-transform duration-200"
             >
-              <div 
-                className="p-1 rounded-full transition-colors"
-                style={{
-                  backgroundColor: isActiveRoute(isLoggedIn ? '/profile' : '/login') 
-                    ? theme.headerfooter.logoRed 
-                    : theme.headerfooter.componentBg
-                }}
-              >
+              <div className="p-1 rounded-full transition-colors group-hover:bg-opacity-20 group-hover:bg-gray-400">
                 {isLoggedIn ? (
-                  <User size={windowWidth < 768 ? 16 : 18} className="sm:w-5 sm:h-5 md:w-5 md:h-5 lg:w-5 lg:h-5" color={theme.headerfooter.text} />
+                  <User 
+                    size={windowWidth < 768 ? 20 : 24} 
+                    className="sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-6 lg:h-6"
+                    color={isActiveRoute('/profile') ? theme.headerfooter.logoRed : theme.headerfooter.text} 
+                  />
                 ) : (
-                  <LogIn size={windowWidth < 768 ? 16 : 18} className="sm:w-5 sm:h-5 md:w-5 md:h-5 lg:w-5 lg:h-5" color={theme.core.text} />
+                  <LogIn 
+                    size={windowWidth < 768 ? 20 : 24} 
+                    className="sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-6 lg:h-6"
+                    color={isActiveRoute('/login') ? theme.headerfooter.logoRed : theme.headerfooter.text} 
+                  />
                 )}
               </div>
               <span 
-                className="text-xs"
-                style={{ color: theme.headerfooter.logoRed }}
+                className={`text-xs sm:text-sm md:text-sm lg:text-sm pt-1 ${isActiveRoute(isLoggedIn ? '/profile' : '/login') ? 'font-bold' : ''}`}
+                style={{ 
+                  color: isActiveRoute(isLoggedIn ? '/profile' : '/login') 
+                    ? theme.headerfooter.logoRed
+                    : theme.headerfooter.text
+                }}
               >
                 {isLoggedIn ? "Profile" : "Login"}
               </span>

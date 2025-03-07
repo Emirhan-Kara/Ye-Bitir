@@ -5,6 +5,7 @@ import Footer from "./components/Footer"
 import HomePage from "./components/HomePage"
 import AdminDashboard from "./components/AdminDashboard"
 import UserManagement from './components/UserManagement';
+import RecipeManagement from './components/RecipeManagement';
 
 function App() {
   return (<HomePage></HomePage>)

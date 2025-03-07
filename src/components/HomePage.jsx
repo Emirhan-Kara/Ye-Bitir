@@ -22,6 +22,7 @@ import RecipeManagement from './RecipeManagement';
 import AdminAnalytics from './AdminAnalytics';
 import AdminSettings from './AdminSettings';
 
+
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
   {
@@ -283,6 +284,7 @@ const AppRoutes = () => {
       <Route path="/admin/recipes" element={<RecipeManagement />} />
       <Route path="/admin/analytics" element={<AdminAnalytics />} />
       <Route path="/admin/settings" element={<AdminSettings />} />
+     
       {/* All other routes with standard layout */}
       <Route path="*" element={<StandardLayout />} />
     </Routes>

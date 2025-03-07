@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Eye, Edit, Trash2, Check, X, Search, Filter } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from './AdminLayout';
 
 const RecipeManagement = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -155,8 +157,15 @@ const RecipeManagement = () => {
     return matchesSearch && matchesStatusFilter && matchesCategoryFilter;
   });
 
+  // View recipe details - Navigate to recipe page
+  const viewRecipe = (recipeId) => {
+    // In a real application, this would navigate to the recipe detail page
+    navigate(`/recipe/${recipeId}`);
+  };
+
   // Approve a pending recipe
-  const approveRecipe = (recipeId) => {
+  const approveRecipe = (recipeId, e) => {
+    e.stopPropagation(); // Prevent row click event
     setRecipes(prevRecipes => 
       prevRecipes.map(recipe => 
         recipe.id === recipeId 
@@ -167,7 +176,8 @@ const RecipeManagement = () => {
   };
 
   // Reject a pending recipe
-  const rejectRecipe = (recipeId) => {
+  const rejectRecipe = (recipeId, e) => {
+    e.stopPropagation(); // Prevent row click event
     setRecipes(prevRecipes => 
       prevRecipes.map(recipe => 
         recipe.id === recipeId 
@@ -178,7 +188,8 @@ const RecipeManagement = () => {
   };
 
   // Toggle featured status
-  const toggleFeatured = (recipeId) => {
+  const toggleFeatured = (recipeId, e) => {
+    e.stopPropagation(); // Prevent row click event
     setRecipes(prevRecipes => 
       prevRecipes.map(recipe => 
         recipe.id === recipeId 
@@ -186,6 +197,20 @@ const RecipeManagement = () => {
           : recipe
       )
     );
+  };
+
+  // Edit recipe
+  const editRecipe = (recipeId, e) => {
+    e.stopPropagation(); // Prevent row click event
+    navigate(`/admin/recipes/edit/${recipeId}`);
+  };
+
+  // Delete recipe
+  const deleteRecipe = (recipeId, e) => {
+    e.stopPropagation(); // Prevent row click event
+    if (window.confirm('Are you sure you want to delete this recipe?')) {
+      setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+    }
   };
 
   return (
@@ -329,7 +354,8 @@ const RecipeManagement = () => {
                 <tr 
                   key={recipe.id} 
                   style={{ backgroundColor: themeColors.table.row }}
-                  className="hover:bg-opacity-80"
+                  className="hover:bg-opacity-80 cursor-pointer"
+                  onClick={() => viewRecipe(recipe.id)}
                   onMouseOver={(e) => e.currentTarget.style.backgroundColor = themeColors.table.hover}
                   onMouseOut={(e) => e.currentTarget.style.backgroundColor = themeColors.table.row}
                 >
@@ -362,9 +388,9 @@ const RecipeManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm" style={{ color: themeColors.text.primary }}>{recipe.likes}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                     <button
-                      onClick={() => toggleFeatured(recipe.id)}
+                      onClick={(e) => toggleFeatured(recipe.id, e)}
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${
                         recipe.featured
                           ? isDark ? 'bg-purple-900 text-purple-100' : 'bg-purple-100 text-purple-800'
@@ -374,12 +400,13 @@ const RecipeManagement = () => {
                       {recipe.featured ? 'Featured' : 'Not Featured'}
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
                     <div className="flex space-x-2">
                       <button 
                         className="p-1 rounded hover:bg-opacity-80"
                         style={{ backgroundColor: isDark ? '#3a4556' : '#e2e8f0' }}
                         title="View Recipe"
+                        onClick={(e) => viewRecipe(recipe.id)}
                       >
                         <Eye className="h-4 w-4" style={{ color: themeColors.text.primary }} />
                       </button>
@@ -387,6 +414,7 @@ const RecipeManagement = () => {
                         className="p-1 rounded hover:bg-opacity-80"
                         style={{ backgroundColor: isDark ? '#3a4556' : '#e2e8f0' }}
                         title="Edit Recipe"
+                        onClick={(e) => editRecipe(recipe.id, e)}
                       >
                         <Edit className="h-4 w-4" style={{ color: themeColors.text.primary }} />
                       </button>
@@ -396,7 +424,7 @@ const RecipeManagement = () => {
                             className="p-1 rounded hover:bg-opacity-80"
                             style={{ backgroundColor: isDark ? '#285e28' : '#d1ffd1' }}
                             title="Approve Recipe"
-                            onClick={() => approveRecipe(recipe.id)}
+                            onClick={(e) => approveRecipe(recipe.id, e)}
                           >
                             <Check className="h-4 w-4" style={{ color: isDark ? '#4ade4a' : '#22c55e' }} />
                           </button>
@@ -404,7 +432,7 @@ const RecipeManagement = () => {
                             className="p-1 rounded hover:bg-opacity-80"
                             style={{ backgroundColor: isDark ? '#5e2828' : '#ffd1d1' }}
                             title="Reject Recipe"
-                            onClick={() => rejectRecipe(recipe.id)}
+                            onClick={(e) => rejectRecipe(recipe.id, e)}
                           >
                             <X className="h-4 w-4" style={{ color: isDark ? '#de4a4a' : '#ef4444' }} />
                           </button>
@@ -414,6 +442,7 @@ const RecipeManagement = () => {
                         className="p-1 rounded hover:bg-opacity-80"
                         style={{ backgroundColor: isDark ? '#3a4556' : '#e2e8f0' }}
                         title="Delete Recipe"
+                        onClick={(e) => deleteRecipe(recipe.id, e)}
                       >
                         <Trash2 className="h-4 w-4" style={{ color: themeColors.text.primary }} />
                       </button>
@@ -445,11 +474,12 @@ const RecipeManagement = () => {
                 .map(recipe => (
                   <div 
                     key={recipe.id} 
-                    className="border rounded-lg p-4"
+                    className="border rounded-lg p-4 cursor-pointer hover:brightness-90 transition-all"
                     style={{ 
                       backgroundColor: isDark ? '#3a4556' : 'white',
                       borderColor: isDark ? '#4a5568' : '#e2e8f0'
                     }}
+                    onClick={() => viewRecipe(recipe.id)}
                   >
                     <h3 className="font-medium mb-2" style={{ color: themeColors.text.primary }}>{recipe.title}</h3>
                     <div className="mb-2">
@@ -464,16 +494,16 @@ const RecipeManagement = () => {
                         {recipe.date}
                       </span>
                     </div>
-                    <div className="flex justify-between mt-4">
+                    <div className="flex justify-between mt-4" onClick={(e) => e.stopPropagation()}>
                       <button
                         className="px-3 py-1 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700"
-                        onClick={() => approveRecipe(recipe.id)}
+                        onClick={(e) => approveRecipe(recipe.id, e)}
                       >
                         Approve
                       </button>
                       <button
                         className="px-3 py-1 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-                        onClick={() => rejectRecipe(recipe.id)}
+                        onClick={(e) => rejectRecipe(recipe.id, e)}
                       >
                         Reject
                       </button>

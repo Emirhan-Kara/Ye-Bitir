@@ -21,7 +21,7 @@ const AboutUs = () => {
       name: "Emirhan Kara",
       role: "Head of Frontend Developers & Team Leader",
       image: "src/assets/emirhan_profilepic.jpeg",
-      bio: "As a 3rd year Computer Engineering student at Kadir Has University, Emirhan leads the team and manages the frontend development.",
+      bio: "As a  Computer Engineering student at Kadir Has University, Emirhan leads the team and manages the frontend development.",
       linkedinUrl:"https://www.linkedin.com/in/emirhan-kara37/",
       githubUrl:"https://github.com/Emirhan-Kara"
     },
@@ -30,25 +30,25 @@ const AboutUs = () => {
       name: "Hayrunnisa Çavdar",
       role: "Head of Backend Developers",
       image: "/api/placeholder/160/160",
-      bio: "Hayrunnisa is a 3rd year Computer Engineering student at Kadir Has University who manages the backend infrastructure.",
+      bio: "Hayrunnisa Computer Engineering student at Kadir Has University who manages the backend infrastructure.",
       linkedinUrl:"https://www.linkedin.com/in/hnisacavdar/",
       githubUrl:"https://github.com/cybernisa"
     },
     {
       id: 3,
       name: "Mohammad Zaid",
-      role: "Head of Testing",
+      role: "Head of Testing & Front Member",
       image: "src/assets/zaid_profilepic.jpg",
-      bio: "A 3rd year Computer Engineering student at Kadir Has University, Mohammad ensures the quality and reliability of the YeBitir platform.",
+      bio: "A Computer Engineering student at Kadir Has University, Mohammad ensures the quality and reliability of the YeBitir platform.",
       linkedinUrl:"https://www.linkedin.com/in/mohammadzaid99/",
       githubUrl: "https://github.com/Mohammad-Zaid-1"
     },
     {
       id: 4,
       name: "Rumeysa Kayam",
-      role: "Head of Documentation",
+      role: "Head of Documentation & Backend Member",
       image: "/api/placeholder/160/160",
-      bio: "Rumeysa is a 3rd year Computer Engineering student at Kadir Has University who documents the project's development",
+      bio: "Rumeysa Computer Engineering student at Kadir Has University who documents the project's development",
       linkedinUrl: "https://www.linkedin.com/in/rumeysakayam/",
       githubUrl: "https://github.com/rumeysakayam"
     }

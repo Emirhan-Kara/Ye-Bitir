@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Home, UtensilsCrossed, Users, BarChart2, Settings, LogOut } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -155,13 +155,14 @@ const AdminDashboard = () => {
                 </div>
               </div>
               
-              <button
+              <Link
+                to="/login"
                 className="flex items-center px-4 py-2 rounded-md text-white"
                 style={{ backgroundColor: themeColors.secondary }}
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
-              </button>
+              </Link>
             </div>
           </div>
 

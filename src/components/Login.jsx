@@ -21,10 +21,16 @@ const Login = () => {
     const result = login(email, password);
     
     if (result.success) {
-      // Check if there's a redirect path in localStorage (from private routes)
-      const redirectPath = localStorage.getItem('redirectPath') || '/';
-      localStorage.removeItem('redirectPath'); // Clear it
-      navigate(redirectPath);
+      // Check if the user is an admin based on email
+      if (email.toLowerCase() === 'admin@gmail.com') {
+        // Navigate to admin dashboard for admin users
+        navigate('/admin');
+      } else {
+        // For regular users, check if there's a redirect path in localStorage (from private routes)
+        const redirectPath = localStorage.getItem('redirectPath') || '/';
+        localStorage.removeItem('redirectPath'); // Clear it
+        navigate(redirectPath);
+      }
     } else {
       setError(result.message || 'Invalid email or password');
     }

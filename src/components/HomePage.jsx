@@ -21,6 +21,7 @@ import UserManagement from './UserManagement';
 import RecipeManagement from './RecipeManagement';
 import AdminAnalytics from './AdminAnalytics';
 import AdminSettings from './AdminSettings';
+import ScrollToTop from './ScrollToTop';
 
 
 // Recipe data that would normally come from an API or database
@@ -261,6 +262,7 @@ const HomePage = () => {
     <ThemeProvider> {/* Wrap with ThemeProvider */}
       <AuthProvider> {/* Wrap with AuthProvider */}
         <Router>
+          <ScrollToTop />
           <AppRoutes />
         </Router>
       </AuthProvider>
@@ -294,14 +296,13 @@ const AppRoutes = () => {
 // Standard layout with Header and Footer
 const StandardLayout = () => {
   const { theme } = useTheme();
-  const { isLoggedIn, currentUser } = useAuth();
   
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.core.background }}>
       {/* Header - isHomepage is true only when on home page */}
       <Routes>
-        <Route path="/" element={<Header isHomepage={true} isLoggedIn={isLoggedIn} user={currentUser} />} />
-        <Route path="*" element={<Header isHomepage={false} isLoggedIn={isLoggedIn} user={currentUser} />} />
+        <Route path="/" element={<Header isHomepage={true} />} />
+        <Route path="*" element={<Header isHomepage={false} />} />
       </Routes>
       
       {/* Main content area with padding to account for fixed header */}

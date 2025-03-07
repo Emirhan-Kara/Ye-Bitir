@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, Home, UtensilsCrossed, Shuffle, Info, FilePlus, User, LogIn, Menu } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext'; // Import the Auth context
 import ThemeToggle from './ThemeToggle';
 
 const Header = ({ 
   isHomepage = false, 
-  isLoggedIn = false, 
   scrollThreshold = 50
 }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -18,6 +18,7 @@ const Header = ({
   const navigate = useNavigate();
   
   const { theme } = useTheme();
+  const { isLoggedIn, currentUser } = useAuth(); // Get authentication state from context
   
   useEffect(() => {
     const handleScroll = () => {
@@ -59,6 +60,9 @@ const Header = ({
       setIsSearchVisible(false);
     }
   };
+
+  // Check if user is admin
+  const isAdmin = currentUser?.role === 'admin';
 
   // Navigation items
   const navItems = [
@@ -185,9 +189,9 @@ const Header = ({
               </Link>
             ))}
             
-            {/* Profile/Login */}
+            {/* Profile/Login - Updated to check for admin role */}
             <Link 
-              to={isLoggedIn ? "/profile" : "/login"} 
+              to={isLoggedIn ? (isAdmin ? "/admin" : "/profile") : "/login"} 
               className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap group transform hover:scale-110 transition-transform duration-200"
             >
               <div className="p-1 rounded-full transition-colors group-hover:bg-opacity-20 group-hover:bg-gray-400">
@@ -195,7 +199,7 @@ const Header = ({
                   <User 
                     size={windowWidth < 768 ? 20 : 24} 
                     className="sm:w-6 sm:h-6 md:w-6 md:h-6 lg:w-6 lg:h-6"
-                    color={isActiveRoute('/profile') ? theme.headerfooter.logoRed : theme.headerfooter.text} 
+                    color={isActiveRoute(isAdmin ? '/admin' : '/profile') ? theme.headerfooter.logoRed : theme.headerfooter.text} 
                   />
                 ) : (
                   <LogIn 
@@ -206,14 +210,14 @@ const Header = ({
                 )}
               </div>
               <span 
-                className={`text-xs sm:text-sm md:text-sm lg:text-sm pt-1 ${isActiveRoute(isLoggedIn ? '/profile' : '/login') ? 'font-bold' : ''}`}
+                className={`text-xs sm:text-sm md:text-sm lg:text-sm pt-1 ${isActiveRoute(isLoggedIn ? (isAdmin ? '/admin' : '/profile') : '/login') ? 'font-bold' : ''}`}
                 style={{ 
-                  color: isActiveRoute(isLoggedIn ? '/profile' : '/login') 
+                  color: isActiveRoute(isLoggedIn ? (isAdmin ? '/admin' : '/profile') : '/login') 
                     ? theme.headerfooter.logoRed
                     : theme.headerfooter.text
                 }}
               >
-                {isLoggedIn ? "Profile" : "Login"}
+                {isLoggedIn ? (isAdmin ? "Admin" : "Profile") : "Login"}
               </span>
             </Link>
           </div>

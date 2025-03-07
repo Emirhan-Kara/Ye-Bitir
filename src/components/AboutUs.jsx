@@ -29,7 +29,7 @@ const AboutUs = () => {
       id: 2,
       name: "Hayrunnisa Çavdar",
       role: "Head of Backend Developers",
-      image: "/api/placeholder/160/160",
+      image: "src/assets/nisa_profilepic.jpg",
       bio: "Hayrunnisa Computer Engineering student at Kadir Has University who manages the backend infrastructure.",
       linkedinUrl:"https://www.linkedin.com/in/hnisacavdar/",
       githubUrl:"https://github.com/cybernisa"
@@ -47,7 +47,7 @@ const AboutUs = () => {
       id: 4,
       name: "Rumeysa Kayam",
       role: "Head of Documentation & Backend Member",
-      image: "/api/placeholder/160/160",
+      image: "src/assets/rumeysa_profilepic.jpeg",
       bio: "Rumeysa Computer Engineering student at Kadir Has University who documents the project's development",
       linkedinUrl: "https://www.linkedin.com/in/rumeysakayam/",
       githubUrl: "https://github.com/rumeysakayam"

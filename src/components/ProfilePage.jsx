@@ -46,7 +46,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [userData, setUserData] = useState({
     username: 'Hayrunnisa',
-    profileImage: '/images/profile.jpg',
+    profileImage: "src/assets/nisa_profilepic.jpg",
     bio: 'Food enjoyer from Kayseri/Türkiye',
     recipesCount: 12,
     savedCount: 34,
@@ -209,7 +209,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                 className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 mb-4 md:mb-0 md:mr-6 relative group"
               >
                 <img 
-                  src={userData.profileImage || "/api/placeholder/128/128"} 
+                  src={userData.profileImage || "src/assets/nisa_profilepic.jpg"} 
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />
@@ -229,14 +229,6 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                   style={{ color: theme.core.text }}
                 >
                   {userData.username}
-                  {currentUser && currentUser.role && (
-                    <span className="ml-2 text-sm px-2 py-1 rounded" style={{ 
-                      backgroundColor: currentUser.role === 'admin' ? theme.headerfooter.logoRed : '#4CAF50',
-                      color: 'white'
-                    }}>
-                      {currentUser.role}
-                    </span>
-                  )}
                 </motion.h1>
                 <motion.p 
                   initial={{ opacity: 0 }}

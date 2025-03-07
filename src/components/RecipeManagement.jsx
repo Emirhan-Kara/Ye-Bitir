@@ -410,14 +410,6 @@ const RecipeManagement = () => {
                       >
                         <Eye className="h-4 w-4" style={{ color: themeColors.text.primary }} />
                       </button>
-                      <button 
-                        className="p-1 rounded hover:bg-opacity-80"
-                        style={{ backgroundColor: isDark ? '#3a4556' : '#e2e8f0' }}
-                        title="Edit Recipe"
-                        onClick={(e) => editRecipe(recipe.id, e)}
-                      >
-                        <Edit className="h-4 w-4" style={{ color: themeColors.text.primary }} />
-                      </button>
                       {recipe.status === 'pending' && (
                         <>
                           <button 

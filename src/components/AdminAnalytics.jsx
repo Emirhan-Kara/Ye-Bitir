@@ -203,7 +203,7 @@ const AdminAnalytics = () => {
         }}>
           <h3 style={{ color: themeColors.text.secondary }} className="text-sm font-medium mb-2">Total Page Views</h3>
           <p className="text-3xl font-bold" style={{ color: themeColors.text.primary }}>65,428</p>
-          <p className="text-sm mt-2" style={{ color: themeColors.primary }}>↑ 18.2% from last month</p>
+          <p className="text-sm mt-2" style={{ color: '#38a169' }}>↑ 18.2% from last month</p>
         </div>
         
         <div className="rounded-lg shadow p-6" style={{ 
@@ -211,7 +211,7 @@ const AdminAnalytics = () => {
         }}>
           <h3 style={{ color: themeColors.text.secondary }} className="text-sm font-medium mb-2">Avg. Session Duration</h3>
           <p className="text-3xl font-bold" style={{ color: themeColors.text.primary }}>4:32</p>
-          <p className="text-sm mt-2" style={{ color: themeColors.primary }}>↑ 5.7% from last month</p>
+          <p className="text-sm mt-2" style={{ color: '#38a169' }}>↑ 5.7% from last month</p>
         </div>
         
         <div className="rounded-lg shadow p-6" style={{ 
@@ -219,7 +219,7 @@ const AdminAnalytics = () => {
         }}>
           <h3 style={{ color: themeColors.text.secondary }} className="text-sm font-medium mb-2">Bounce Rate</h3>
           <p className="text-3xl font-bold" style={{ color: themeColors.text.primary }}>32.8%</p>
-          <p className="text-sm mt-2" style={{ color: '#38a169' }}>↓ 3.4% from last month</p>
+          <p className="text-sm mt-2" style={{ color: themeColors.primary }}>↓ 3.4% from last month</p>
         </div>
         
         <div className="rounded-lg shadow p-6" style={{ 
@@ -227,7 +227,7 @@ const AdminAnalytics = () => {
         }}>
           <h3 style={{ color: themeColors.text.secondary }} className="text-sm font-medium mb-2">Conversion Rate</h3>
           <p className="text-3xl font-bold" style={{ color: themeColors.text.primary }}>7.6%</p>
-          <p className="text-sm mt-2" style={{ color: themeColors.primary }}>↑ 1.2% from last month</p>
+          <p className="text-sm mt-2" style={{ color: '#38a169' }}>↑ 1.2% from last month</p>
         </div>
       </div>
 

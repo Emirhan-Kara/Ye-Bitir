@@ -70,10 +70,10 @@ const SignUp = () => {
             {/* Logo/Brand */}
             <div className="flex justify-center">
               <Link to="/" className="flex flex-col items-center">
-                <span className="font-bold text-4xl text-gray-900" style={{ fontFamily: "'Rubik Doodle Shadow', cursive" }}>
+                <span className="font-bold text-4xl text-gray-900" style={{ fontFamily: "cursive" }}>
                   Ye
                 </span>
-                <span className="font-bold text-4xl text-red-800" style={{ fontFamily: "'Rubik Glitch', cursive" }}>
+                <span className="font-bold text-4xl text-red-800" style={{ fontFamily: "cursive" }}>
                   Bitir
                 </span>
               </Link>

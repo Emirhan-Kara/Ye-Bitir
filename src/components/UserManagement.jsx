@@ -276,13 +276,6 @@ const UserManagement = () => {
                       <button 
                         className="p-1 rounded hover:bg-opacity-80"
                         style={{ backgroundColor: isDark ? '#3a4556' : '#e2e8f0' }}
-                        title="View User Details"
-                      >
-                        <Eye className="h-4 w-4" style={{ color: themeColors.text.primary }} />
-                      </button>
-                      <button 
-                        className="p-1 rounded hover:bg-opacity-80"
-                        style={{ backgroundColor: isDark ? '#3a4556' : '#e2e8f0' }}
                         title={user.status === 'active' ? 'Block User' : 'Unblock User'}
                         onClick={() => toggleUserStatus(user.id)}
                       >

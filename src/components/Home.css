@@ -1,190 +1,250 @@
-/* Animation keyframes */
-@keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+/* Action buttons */
+.action-button {
+  min-width: 200px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.action-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  transform: rotate(45deg);
+  transition: all 0.8s ease;
+}
+
+.action-button:hover::before {
+  transform: rotate(45deg) translate(50%, 50%);
+}
+
+/* Recipe wheel button */
+.recipe-wheel-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-wheel-btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  transform: translateX(-100%);
+}
+
+.recipe-wheel-btn:hover::after {
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
-  
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+}/* Additional styles for edgy shapes and animations - add to Home.css */
+
+/* Edgy shape animations */
+@keyframes pulseEdgy {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
   }
-  
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  @keyframes float {
-    0% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-    100% {
-      transform: translateY(0px);
-    }
-  }
-  
-  /* Utility classes for animations */
-  .animate-fadeIn {
-    animation: fadeIn 1s ease-out forwards;
-  }
-  
-  .animate-slideInRight {
-    animation: slideInRight 0.8s ease-out forwards;
-  }
-  
-  .animate-slideInLeft {
-    animation: slideInLeft 0.8s ease-out forwards;
-  }
-  
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
-  
-  /* Delay classes */
-  .delay-100 {
-    animation-delay: 100ms;
-  }
-  
-  .delay-200 {
-    animation-delay: 200ms;
-  }
-  
-  .delay-300 {
-    animation-delay: 300ms;
-  }
-  
-  .delay-400 {
-    animation-delay: 400ms;
-  }
-  
-  .delay-500 {
-    animation-delay: 500ms;
-  }
-  
-  /* Scrolling animations */
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease;
-  }
-  
-  .reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  /* Custom styles for the homepage */
-  .recipe-card-shadow {
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-  
-  .recipe-card-shadow:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transform: translateY(-5px);
-  }
-  
-  /* Hero section styles */
-  .hero-wave {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-  }
-  
-  .hero-wave svg {
-    position: relative;
-    display: block;
-    width: calc(100% + 1.3px);
-    height: 80px;
-  }
-  
-  /* Category section styles */
-  .category-card {
-    transition: all 0.3s ease;
-    overflow: hidden;
-    border-radius: 1rem;
-  }
-  
-  .category-card img {
-    transition: transform 0.5s ease;
-  }
-  
-  .category-card:hover img {
+  50% {
     transform: scale(1.05);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+.edgy-shape {
+  opacity: 0.5;
+  transition: transform 0.3s ease-out, opacity 0.3s ease;
+}
+
+.edgy-shape:hover {
+  opacity: 0.7;
+  animation: pulseEdgy 3s infinite;
+}
+
+/* Edgy button and input hover effects */
+.edgy-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+}
+
+.edgy-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments for edgy shapes */
+@media (max-width: 768px) {
+  .edgy-shape {
+    opacity: 0.3;
+  }
+}
+
+/* Animation for background shapes on hover */
+.edgy-shapes-container:hover .edgy-shape {
+  opacity: 0.6;
+}
+
+/* Responsive adjustments for edgy input and button */
+@media (max-width: 640px) {
+  .edgy-input, .edgy-button {
+    height: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
   
-  .category-overlay {
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-    transition: all 0.3s ease;
+  .search-container {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+/* Edgy corners for elements */
+.edgy-corner {
+  clip-path: polygon(0 10%, 10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%);
+}
+
+/* Pulsating border animation */
+@keyframes borderPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.4);
+  }
+}
+
+.pulse-border:hover {
+  animation: borderPulse 2s infinite;
+}
+
+/* Responsive angles for small screens */
+@media (max-width: 480px) {
+  .edgy-input {
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
   }
   
-  .category-card:hover .category-overlay {
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 100%);
+  .edgy-button {
+    clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
   }
-  
-  /* Call to action styles */
-  .cta-blob {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.1;
-    background: white;
-    z-index: 0;
-  }
-  
-  .cta-blob-1 {
-    top: -50px;
-    left: -50px;
-    width: 200px;
-    height: 200px;
-  }
-  
-  .cta-blob-2 {
-    bottom: -80px;
-    right: -80px;
-    width: 300px;
-    height: 300px;
-  }
-  
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+}
+
+/* Dynamic background shapes that shift with mouse movement */
+.home-container {
+  perspective: 1000px;
+}
+
+.edgy-shapes-container {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.edgy-shape {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Enhanced reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Category boxes styling */
+.edgy-heading {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.edgy-heading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 4px;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+}
+
+.category-box {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-box::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+}
+
+.category-box:hover::before {
+  transform: rotate(45deg) translate(50%, 50%);
+}
+
+/* Ingredient tags */
+.ingredient-tag {
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ingredient-tag:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+/* Cuisine overlay */
+.category-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 100%);
+  transition: all 0.3s ease;
+}
+
+.category-card:hover .category-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 70%);
+}

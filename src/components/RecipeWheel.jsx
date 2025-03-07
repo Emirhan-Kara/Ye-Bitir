@@ -188,14 +188,6 @@ const RecipeWheel = () => {
     { color: '#10b981' }, // Emerald
     { color: '#06b6d4' }  // Cyan
   ];
-
-  // Memoize the welcome message to prevent unnecessary re-renders
-  const welcomeMessage = useMemo(() => {
-    if (isLoggedIn && currentUser) {
-      return `Welcome, ${currentUser.role === 'admin' ? 'Admin' : 'User'} (${currentUser.email}). `;
-    }
-    return '';
-  }, [isLoggedIn, currentUser]);
   
   return (
     <div 
@@ -208,7 +200,6 @@ const RecipeWheel = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         <h1 className="edgy-title text-center mb-8 spin-in">RECIPE WHEEL</h1>
         <p className="text-xl mb-8 text-center fade-in-up">
-          {welcomeMessage}
           Select your preferences and spin the wheel to discover your next meal!
           {!isLoggedIn && (
             <span className="block text-sm mt-2" style={{ color: theme.headerfooter.logoRed }}>

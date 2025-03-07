@@ -232,7 +232,7 @@ const Home = () => {
       style={{ backgroundColor: theme.core.background, color: theme.core.text }}
     >
       {/* AnimatedFoodIconsBackground */}
-      <AnimatedFoodIconsBackground count={60} />
+      <AnimatedFoodIconsBackground count={120} />
       
       {/* Edgy shapes that respond to mouse movement */}
       <div className="edgy-shapes-container absolute inset-0 z-0">
@@ -240,14 +240,14 @@ const Home = () => {
       </div>
       
       {/* Main content container */}
-      <div className="content-container relative z-10 max-w-6xl mx-auto py-12 px-4 mt-16">
+      <div className="content-container relative z-10 max-w-6xl mx-auto py-12 px-4 mt-8">
         <div className="hero-section text-center mb-12">
           <h1 className="edgy-title text-5xl font-bold mb-4 animate-fadeIn">
             <span style={{ color: theme.headerfooter.logoRed }}>Ye</span>
             <span>Bitir</span>
           </h1>
           <p className="text-xl mb-8 animate-fadeIn delay-200">
-            Discover, cook, and share amazing recipes!
+            Discover, share, and savor amazing recipes!
           </p>
           
           {/* Search bar with edgy design for small screens */}
@@ -285,6 +285,21 @@ const Home = () => {
           </div>
         </div>
         
+        {/* Recipe Wheel Button */}
+        <div className="flex justify-center mt-10">
+            <button 
+              onClick={() => navigateTo('/recipe-wheel')}
+              className="recipe-wheel-btn flex items-center gap-2 px-6 py-3 transform hover:scale-105 transition-transform duration-200 edgy-corner"
+              style={{ 
+                backgroundColor: theme.headerfooter.logoRed,
+                color: theme.recipecard.componentText
+              }}
+            >
+              <Shuffle size={20} />
+              <span className="font-semibold">Try Our Recipe Wheel</span>
+            </button>
+          </div>
+
         {/* Featured recipes section */}
         <div className="featured-section mt-16 reveal">
           <div className="text-center mb-8">
@@ -316,20 +331,7 @@ const Home = () => {
             ))}
           </div>
           
-          {/* Recipe Wheel Button */}
-          <div className="flex justify-center mt-10">
-            <button 
-              onClick={() => navigateTo('/recipe-wheel')}
-              className="recipe-wheel-btn flex items-center gap-2 px-6 py-3 transform hover:scale-105 transition-transform duration-200 edgy-corner"
-              style={{ 
-                backgroundColor: theme.headerfooter.logoRed,
-                color: theme.recipecard.componentText
-              }}
-            >
-              <Shuffle size={20} />
-              <span className="font-semibold">Try Our Recipe Wheel</span>
-            </button>
-          </div>
+          
         </div>
         
         {/* Cuisines section */}

@@ -92,13 +92,13 @@ const Header = ({
           <Link to="/" className="flex flex-col items-center">
             <span 
               className="font-bold text-xl" 
-              style={{ color: theme.headerfooter.logoRed }}
+              style={{ color: theme.headerfooter.logoRed, fontFamily: "cursive" }}
             >
               Ye
             </span>
             <span 
               className="font-bold text-xl" 
-              style={{ color: theme.core.text }}
+              style={{ color: theme.core.text, fontFamily: "cursive" }}
             >
               Bitir
             </span>

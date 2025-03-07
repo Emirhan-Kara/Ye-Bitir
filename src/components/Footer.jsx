@@ -20,13 +20,13 @@ const Footer = () => {
             <h2 className="text-3xl font-bold">
               <span 
                 className="text-xl" 
-                style={{ color: theme.headerfooter.logoRed }}
+                style={{ color: theme.headerfooter.logoRed, fontFamily: "cursive" }}
               >
                 Ye
               </span>
               <span 
                 className="text-xl" 
-                style={{ color: theme.headerfooter.text }}
+                style={{ color: theme.headerfooter.text, fontFamily: "cursive" }}
               >
                 Bitir
               </span>

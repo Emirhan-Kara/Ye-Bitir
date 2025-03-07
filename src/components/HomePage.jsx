@@ -15,7 +15,7 @@ import AddRecipePage from './AddRecipePage';
 import SearchPage from './SearchPage';
 import KVKKCompliance from './KVKKCompliance';
 import PrivacyPolicy from './PrivacyPolicy';
-import Home from './Home'; // Import the new Home component
+import Home from './Home';
 import AdminDashboard from './AdminDashboard';
 import UserManagement from './UserManagement';
 import RecipeManagement from './RecipeManagement';
@@ -28,6 +28,7 @@ import ScrollToTop from './ScrollToTop';
 const dummyRecipes = [
   {
     id: 1,
+    owner: "hcavdar",
     title: "Mediterranean Grilled Chicken Salad",
     image: "/api/placeholder/400/300",
     timeInMins: 35,
@@ -84,6 +85,7 @@ const dummyRecipes = [
   },
   {
     id: 2,
+    owner: "emirhan",
     title: "Creamy Mushroom Risotto",
     image: "/api/placeholder/400/300",
     timeInMins: 45,
@@ -142,6 +144,7 @@ const dummyRecipes = [
   },
   {
     id: 3,
+    owner: "zaid",
     title: "Spicy Chocolate Brownies",
     image: "/api/placeholder/400/300",
     timeInMins: 40,

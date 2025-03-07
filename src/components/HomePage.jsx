@@ -16,6 +16,7 @@ import SearchPage from './SearchPage';
 import KVKKCompliance from './KVKKCompliance';
 import PrivacyPolicy from './PrivacyPolicy';
 import Home from './Home'; // Import the new Home component
+import AdminDashboard from './AdminDashboard';
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -269,6 +270,11 @@ const AppRoutes = () => {
       {/* Full-screen Login and SignUp routes without Header/Footer */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/admin" element={
+        <ThemeProvider>
+          <AdminDashboard />
+        </ThemeProvider>
+      } />
       
       {/* All other routes with standard layout */}
       <Route path="*" element={<StandardLayout />} />

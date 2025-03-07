@@ -19,6 +19,7 @@ import Home from './Home'; // Import the new Home component
 import AdminDashboard from './AdminDashboard';
 import UserManagement from './UserManagement';
 import RecipeManagement from './RecipeManagement';
+import AdminAnalytics from './AdminAnalytics';
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
   {
@@ -278,6 +279,7 @@ const AppRoutes = () => {
       } />
       <Route path="/admin/users" element={<UserManagement />} />
       <Route path="/admin/recipes" element={<RecipeManagement />} />
+      <Route path="/admin/analytics" element={<AdminAnalytics />} />
       {/* All other routes with standard layout */}
       <Route path="*" element={<StandardLayout />} />
     </Routes>

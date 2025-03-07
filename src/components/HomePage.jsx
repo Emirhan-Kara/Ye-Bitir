@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useParams, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import RecipeCard from './RecipeCard';
 import RecipePage from './RecipePage';
 import SuggestionsSection from './SuggestionsSection';
 import RecipeWheel from './RecipeWheel';
@@ -16,6 +15,7 @@ import AddRecipePage from './AddRecipePage';
 import SearchPage from './SearchPage';
 import KVKKCompliance from './KVKKCompliance';
 import PrivacyPolicy from './PrivacyPolicy';
+import Home from './Home'; // Import the new Home component
 
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
@@ -249,54 +249,6 @@ const RecipeDetail = () => {
   );
 };
 
-// Home page component
-const Home = () => {
-  const { theme } = useTheme();
-  const { isLoggedIn, currentUser } = useAuth();
-  
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Hero section */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">
-          <span style={{ color: theme.core.text }}> Welcome to </span>
-          <span style={{ color: theme.headerfooter.logoRed }}>Ye</span>
-          <span style={{ color: theme.core.text }}> Bitir</span>
-        </h1>
-        <p className="text-xl max-w-3xl mx-auto" style={{ color: theme.core.text, opacity: 0.7 }}>
-          Discover amazing recipes from around the world, share your own creations, and connect with food lovers.
-        </p>
-      </div>
-      
-      {/* Featured recipes section */}
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: theme.core.text }}>
-          Featured Recipes
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {dummyRecipes.map(recipe => (
-            <Link 
-              key={recipe.id}
-              to={`/recipe/${recipe.id}`}
-              className="no-underline"
-            >
-              <div className="cursor-pointer transition-transform hover:scale-105">
-                <RecipeCard
-                  title={recipe.title}
-                  image={recipe.image}
-                  timeInMins={recipe.timeInMins}
-                  rating={recipe.rating}
-                  servings={recipe.servings}
-                />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Main App Component with Router
 const HomePage = () => {
   return (
@@ -343,7 +295,6 @@ const StandardLayout = () => {
           <Route path="/" element={<Home />} />
           <Route path="/recipe/:recipeId" element={<RecipeDetail />} />
           <Route path="/search" element={<SearchPage />} />
-          {/* RecipeWheel is now public - authentication check will happen on spin */}
           <Route path="/recipe-wheel" element={<RecipeWheel />} />
           <Route path="/recipes" element={<SearchPage />} />
           <Route path="/about" element={<AboutUs />} />

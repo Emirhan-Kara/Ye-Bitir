@@ -1,0 +1,190 @@
+/* Animation keyframes */
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  
+  /* Utility classes for animations */
+  .animate-fadeIn {
+    animation: fadeIn 1s ease-out forwards;
+  }
+  
+  .animate-slideInRight {
+    animation: slideInRight 0.8s ease-out forwards;
+  }
+  
+  .animate-slideInLeft {
+    animation: slideInLeft 0.8s ease-out forwards;
+  }
+  
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  /* Delay classes */
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+  
+  /* Scrolling animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+  
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Custom styles for the homepage */
+  .recipe-card-shadow {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .recipe-card-shadow:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-5px);
+  }
+  
+  /* Hero section styles */
+  .hero-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+  }
+  
+  .hero-wave svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 80px;
+  }
+  
+  /* Category section styles */
+  .category-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border-radius: 1rem;
+  }
+  
+  .category-card img {
+    transition: transform 0.5s ease;
+  }
+  
+  .category-card:hover img {
+    transform: scale(1.05);
+  }
+  
+  .category-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .category-card:hover .category-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 100%);
+  }
+  
+  /* Call to action styles */
+  .cta-blob {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+    z-index: 0;
+  }
+  
+  .cta-blob-1 {
+    top: -50px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+  }
+  
+  .cta-blob-2 {
+    bottom: -80px;
+    right: -80px;
+    width: 300px;
+    height: 300px;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }

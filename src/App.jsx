@@ -7,6 +7,7 @@ import AdminDashboard from "./components/AdminDashboard"
 import UserManagement from './components/UserManagement';
 import RecipeManagement from './components/RecipeManagement';
 import AdminAnalytics from "./components/AdminAnalytics"
+import AdminSettings from "./components/AdminSettings"
 
 function App() {
   return (<HomePage></HomePage>)

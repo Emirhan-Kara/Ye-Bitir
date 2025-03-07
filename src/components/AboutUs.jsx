@@ -395,59 +395,59 @@ const AboutUs = () => {
             </div>
           </div>
           <div className="md:w-1/2">
-            <form 
-              style={{ backgroundColor: theme.core.container }} 
-              className="p-8 rounded-[30px] shadow-xl transform-gpu hover:translate-y-[-5px] transition-all duration-300"
-            >
-              <h3 className="text-2xl font-bold mb-6" style={{ color: theme.core.text }}>Leave Us a Message</h3>
-              <div className="mb-6">
-                <input 
-                  type="text" 
-                  id="name" 
-                  placeholder="Your Name"
-                  className="w-full p-4 border rounded-[15px] focus:outline-none transition-all duration-300 focus:ring-2" 
-                  style={{ 
-                    backgroundColor: theme.headerfooter.searchBox, 
-                    borderColor: theme.core.containerHoover, 
-                    color: theme.core.text 
-                  }} 
-                />
-              </div>
-              <div className="mb-6">
-                <input 
-                  type="email" 
-                  id="email" 
-                  placeholder="Email Address"
-                  className="w-full p-4 border rounded-lg focus:outline-none transition-all duration-300 focus:ring-2" 
-                  style={{ 
-                    backgroundColor: theme.headerfooter.searchBox, 
-                    borderColor: theme.core.containerHoover, 
-                    color: theme.core.text 
-                  }} 
-                />
-              </div>
-              <div className="mb-6">
-                <textarea 
-                  id="message" 
-                  rows="5" 
-                  placeholder="Your Message"
-                  className="w-full p-4 border rounded-lg focus:outline-none transition-all duration-300 focus:ring-2" 
-                  style={{ 
-                    backgroundColor: theme.headerfooter.searchBox, 
-                    borderColor: theme.core.containerHoover, 
-                    color: theme.core.text 
-                  }}
-                ></textarea>
-              </div>
-              <button 
-                type="submit" 
-                style={{ backgroundColor: theme.core.containerHoover, color: theme.core.text }} 
-                className="py-4 px-8 rounded-[15px] hover:shadow-lg transition-all duration-300 w-full cursor-pointer font-medium text-lg hover:scale-[1.02]"
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
+  <form 
+    style={{ backgroundColor: theme.core.container }} 
+    className="p-8 rounded-[30px] shadow-xl transform-gpu hover:translate-y-[-5px] transition-all duration-300"
+  >
+    <h3 className="text-2xl font-bold mb-6" style={{ color: theme.core.text }}>Leave Us a Message</h3>
+    <div className="mb-6">
+      <input 
+        type="text" 
+        id="name" 
+        placeholder="Your Name"
+        className="w-full p-4 border rounded-[15px] focus:outline-none transition-all duration-300 focus:ring-2" 
+        style={{ 
+          backgroundColor: theme.headerfooter.searchBox, 
+          borderColor: theme.core.containerHoover, 
+          color: theme.core.text 
+        }} 
+      />
+    </div>
+    <div className="mb-6">
+      <input 
+        type="email" 
+        id="email" 
+        placeholder="Email Address"
+        className="w-full p-4 border rounded-lg focus:outline-none transition-all duration-300 focus:ring-2" 
+        style={{ 
+          backgroundColor: theme.headerfooter.searchBox, 
+          borderColor: theme.core.containerHoover, 
+          color: theme.core.text 
+        }} 
+      />
+    </div>
+    <div className="mb-6">
+      <textarea 
+        id="message" 
+        rows="5" 
+        placeholder="Your Message"
+        className="w-full p-4 border rounded-lg focus:outline-none transition-all duration-300 focus:ring-2" 
+        style={{ 
+          backgroundColor: theme.headerfooter.searchBox, 
+          borderColor: theme.core.containerHoover, 
+          color: theme.core.text 
+        }}
+      ></textarea>
+    </div>
+    <button 
+      type="submit" 
+      style={{ backgroundColor: theme.headerfooter.logoRed, color: "#ffffff" }} 
+      className="py-4 px-8 rounded-[15px] hover:shadow-lg transition-all duration-300 w-full cursor-pointer font-medium text-lg hover:scale-[1.02]"
+    >
+      Send Message
+    </button>
+  </form>
+</div>
         </div>
       </div>
 

@@ -20,29 +20,37 @@ const AboutUs = () => {
       id: 1,
       name: "Emirhan Kara",
       role: "Head of Frontend Developers & Team Leader",
-      image: "/api/placeholder/160/160",
-      bio: "As a 3rd year Computer Engineering student at Kadir Has University, Emirhan leads the team and manages the frontend development, ensuring intuitive user experience for YeBitir's users."
+      image: "src/assets/emirhan_profilepic.jpeg",
+      bio: "As a 3rd year Computer Engineering student at Kadir Has University, Emirhan leads the team and manages the frontend development.",
+      linkedinUrl:"https://www.linkedin.com/in/emirhan-kara37/",
+      githubUrl:"https://github.com/Emirhan-Kara"
     },
     {
       id: 2,
       name: "Hayrunnisa Çavdar",
       role: "Head of Backend Developers",
       image: "/api/placeholder/160/160",
-      bio: "Hayrunnisa is a 3rd year Computer Engineering student at Kadir Has University who manages the backend infrastructure, ensuring the platform operates smoothly and securely."
+      bio: "Hayrunnisa is a 3rd year Computer Engineering student at Kadir Has University who manages the backend infrastructure.",
+      linkedinUrl:"https://www.linkedin.com/in/hnisacavdar/",
+      githubUrl:"https://github.com/cybernisa"
     },
     {
       id: 3,
       name: "Mohammad Zaid",
       role: "Head of Testing",
-      image: "/api/placeholder/160/160",
-      bio: "A 3rd year Computer Engineering student at Kadir Has University, Mohammad ensures quality and reliability by implementing rigorous testing protocols for all aspects of the YeBitir platform."
+      image: "src/assets/zaid_profilepic.jpg",
+      bio: "A 3rd year Computer Engineering student at Kadir Has University, Mohammad ensures the quality and reliability of the YeBitir platform.",
+      linkedinUrl:"https://www.linkedin.com/in/mohammadzaid99/",
+      githubUrl: "https://github.com/Mohammad-Zaid-1"
     },
     {
       id: 4,
       name: "Rumeysa Kayam",
       role: "Head of Documentation",
       image: "/api/placeholder/160/160",
-      bio: "Rumeysa is a 3rd year Computer Engineering student at Kadir Has University who meticulously documents the project's development, creates user guides, and ensures knowledge transfer within the team."
+      bio: "Rumeysa is a 3rd year Computer Engineering student at Kadir Has University who documents the project's development",
+      linkedinUrl: "https://www.linkedin.com/in/rumeysakayam/",
+      githubUrl: "https://github.com/rumeysakayam"
     }
   ];
 
@@ -124,15 +132,16 @@ const AboutUs = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
           >
-            About <span className="text-gradient">YeBitir</span>
+            <span className="text-gradient">Discover Share Savor</span>
           </motion.h1>
           <motion.p 
-            className="text-xl md:text-2xl max-w-3xl mx-auto"
+            className="text-xl md:text-xl max-w-3xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            Connecting food lovers with authentic, delicious recipes - A Software Engineering Project
+            Food is more than just sustenance, it is an experience, a story, a connection.
+            At <span className="text-gradient font-bold">Ye Bitir</span>, we bring together food lovers from around the world to share and discover mouthwatering recipes.
           </motion.p>
           <motion.div 
             className="mt-8"
@@ -159,12 +168,6 @@ const AboutUs = () => {
           <p className="text-lg md:text-xl leading-relaxed" style={{ color: theme.core.text }}>
             YeBitir (meaning "Eat-it-Up" in Turkish) is a Software Engineering course project developed by 3rd year Computer Engineering students at Kadir Has University.
           </p>
-          <div className="mt-8 flex justify-center gap-2 flex-wrap">
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: theme.core.containerHoover }}>Software Engineering</span>
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: theme.core.containerHoover }}>Recipe Platform</span>
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: theme.core.containerHoover }}>Turkish Cuisine</span>
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: theme.core.containerHoover }}>Student Project</span>
-          </div>
         </div>
       </div>
 
@@ -222,17 +225,12 @@ const AboutUs = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                   <div className="flex justify-center gap-4">
-                    <a href="#" className="text-white hover:text-gray-200">
+                    <a href={member.githubUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-200">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                       </svg>
                     </a>
-                    <a href="#" className="text-white hover:text-gray-200">
-                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                      </svg>
-                    </a>
-                    <a href="#" className="text-white hover:text-gray-200">
+                    <a href={member.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-200">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm-1-7a1 1 0 100-2 1 1 0 000 2zm7 7h-2v-4c0-.55-.45-1-1-1s-1 .45-1 1v4h-2v-6h2v1.39c.36-.63 1.26-.78 1.8-.78 1.54 0 2.2 1.31 2.2 3.01V17z" clipRule="evenodd" />
                       </svg>
@@ -248,6 +246,8 @@ const AboutUs = () => {
             </motion.div>
           ))}
         </motion.div>
+
+
       </div>
       
       {/* Wavy divider before Join us section */}
@@ -368,7 +368,7 @@ const AboutUs = () => {
                   <div className="p-3 rounded-full mr-4" style={{ backgroundColor: theme.core.containerHoover }}>
                     <span style={{ color: theme.core.text }} className="text-xl">📍</span>
                   </div>
-                  <div>
+                  <div className='text-left'>
                     <h4 className="font-medium mb-1">Our Location</h4>
                     <span style={{ color: theme.core.text }}>Kadir Has University, Cibali, Istanbul, Turkey</span>
                   </div>
@@ -377,16 +377,16 @@ const AboutUs = () => {
                   <div className="p-3 rounded-full mr-4" style={{ backgroundColor: theme.core.containerHoover }}>
                     <span style={{ color: theme.core.text }} className="text-xl">📧</span>
                   </div>
-                  <div>
+                  <div className='text-left'>
                     <h4 className="font-medium mb-1">Email Us</h4>
-                    <span style={{ color: theme.core.text }}>yebitir@khas.edu.tr</span>
+                    <span style={{ color: theme.core.text }}>yebitir@gmail.com</span>
                   </div>
                 </div>
                 <div className="flex items-start">
                   <div className="p-3 rounded-full mr-4" style={{ backgroundColor: theme.core.containerHoover }}>
                     <span style={{ color: theme.core.text }} className="text-xl">🏛️</span>
                   </div>
-                  <div>
+                  <div className='text-left'>
                     <h4 className="font-medium mb-1">Department</h4>
                     <span style={{ color: theme.core.text }}>Department of Computer Engineering</span>
                   </div>
@@ -401,10 +401,10 @@ const AboutUs = () => {
             >
               <h3 className="text-2xl font-bold mb-6" style={{ color: theme.core.text }}>Leave Us a Message</h3>
               <div className="mb-6">
-                <label htmlFor="name" className="block mb-2 font-medium" style={{ color: theme.core.text }}>Your Name</label>
                 <input 
                   type="text" 
                   id="name" 
+                  placeholder="Your Name"
                   className="w-full p-4 border rounded-[15px] focus:outline-none transition-all duration-300 focus:ring-2" 
                   style={{ 
                     backgroundColor: theme.headerfooter.searchBox, 
@@ -414,10 +414,10 @@ const AboutUs = () => {
                 />
               </div>
               <div className="mb-6">
-                <label htmlFor="email" className="block mb-2 font-medium" style={{ color: theme.core.text }}>Email Address</label>
                 <input 
                   type="email" 
                   id="email" 
+                  placeholder="Email Address"
                   className="w-full p-4 border rounded-lg focus:outline-none transition-all duration-300 focus:ring-2" 
                   style={{ 
                     backgroundColor: theme.headerfooter.searchBox, 
@@ -427,10 +427,10 @@ const AboutUs = () => {
                 />
               </div>
               <div className="mb-6">
-                <label htmlFor="message" className="block mb-2 font-medium" style={{ color: theme.core.text }}>Message</label>
                 <textarea 
                   id="message" 
                   rows="5" 
+                  placeholder="Your Message"
                   className="w-full p-4 border rounded-lg focus:outline-none transition-all duration-300 focus:ring-2" 
                   style={{ 
                     backgroundColor: theme.headerfooter.searchBox, 

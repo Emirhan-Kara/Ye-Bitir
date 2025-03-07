@@ -17,7 +17,7 @@ import KVKKCompliance from './KVKKCompliance';
 import PrivacyPolicy from './PrivacyPolicy';
 import Home from './Home'; // Import the new Home component
 import AdminDashboard from './AdminDashboard';
-
+import UserManagement from './UserManagement';
 // Recipe data that would normally come from an API or database
 const dummyRecipes = [
   {
@@ -275,6 +275,7 @@ const AppRoutes = () => {
           <AdminDashboard />
         </ThemeProvider>
       } />
+      <Route path="/admin/users" element={<UserManagement />} />
       
       {/* All other routes with standard layout */}
       <Route path="*" element={<StandardLayout />} />

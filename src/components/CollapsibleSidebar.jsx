@@ -35,6 +35,8 @@ const CollapsibleSidebar = () => {
     <aside 
       className={`transition-all duration-300 ${collapsed ? "w-16" : "w-64"} h-screen fixed left-0 top-0 z-30`} 
       style={{ backgroundColor: themeColors.secondary }}
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
     >
       <div className={`flex items-center ${collapsed ? "justify-center" : "justify-between"} p-4`}>
         {!collapsed && (
@@ -43,14 +45,7 @@ const CollapsibleSidebar = () => {
             <span style={{ color: themeColors.primary }}>Bitir</span>
           </h2>
         )}
-        <button 
-          onClick={toggleSidebar}
-          className="p-1 rounded-full text-white hover:bg-opacity-80"
-          style={{ backgroundColor: themeColors.primary }}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
+        {/* Toggle button removed since we're using hover */}
       </div>
       <nav className="mt-6">
         <Link 

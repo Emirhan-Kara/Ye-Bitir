@@ -8,6 +8,7 @@ import RecipeWheel from './RecipeWheel';
 import Login from './Login';
 import SignUp from './SignUp';
 import ProfilePage from './ProfilePage';
+import UserProfilePage from './UserProfilePage';
 import AboutUs from './AboutUs';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
@@ -252,7 +253,7 @@ const RecipeDetail = () => {
         headerImage={recipe.headerImage}
         ingredients={recipe.ingredients}
         instructions={recipe.instructions}
-        tags={recipe.tags}
+        owner={recipe.owner || "unknown"}
         initialComments={recipe.initialComments}
       />
     </div>
@@ -332,6 +333,7 @@ const StandardLayout = () => {
               <ProfilePage initialTab="settings" />
             </PrivateRoute>
           } />
+          <Route path="/profile/:username" element={<UserProfilePage />} />
           <Route path="/kvkk" element={<KVKKCompliance />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
         </Routes>

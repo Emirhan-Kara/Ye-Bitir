@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import ImageComponent from './ImageComponent';
 import CommentsSection from './CommentsSection';
 import SuggestionsSection from './SuggestionsSection';
@@ -15,7 +15,7 @@ const RecipePage = ({
   headerImage,
   ingredients,
   instructions,
-  tags,
+  owner,
   initialComments
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -215,7 +215,7 @@ const RecipePage = ({
           ))}
         </div>
 
-        {/* Ingredients and Tags */}
+        {/* Ingredients and Owner */}
         <div className="md:col-span-1">
           <h2 className="text-3xl font-bold mb-4">Ingredients</h2>
           <ul className="mb-10 space-y-2">
@@ -227,15 +227,27 @@ const RecipePage = ({
             ))}
           </ul>
 
-          <h2 className="text-3xl font-bold mb-4">Tags</h2>
-          <ul className="space-y-2">
-            {tags.map((tag, index) => (
-              <li key={index} className="flex items-baseline">
-                <span className="text-yellow-400 mr-2">•</span>
-                {tag}
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-3xl font-bold mb-4">Recipe By</h2>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: theme.core.containerHoover }}>
+            <Link 
+              to={`/profile/${owner}`} 
+              className="flex items-center hover:scale-105 transition-transform duration-300"
+            >
+              <div className="w-12 h-12 rounded-full bg-gray-300 mr-3 flex items-center justify-center overflow-hidden">
+                <img 
+                  src={`/api/placeholder/50/50`} 
+                  alt={owner} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <p className="font-bold text-lg" style={{ color: theme.headerfooter.logoRed }}>
+                  {owner}
+                </p>
+                <p className="text-sm">View Profile</p>
+              </div>
+            </Link>
+          </div>
         </div>
 
       </div><br />

@@ -1,16 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import CollapsibleSidebar from './CollapsibleSidebar';
+import { useAuth } from '../context/AuthContext';
 
 // This is a wrapper component for all admin pages
 const AdminLayout = ({ children, pageTitle, pageDescription }) => {
   const { theme, toggleTheme } = useTheme();
+  const { logout, currentUser } = useAuth();
   
   // Default theme values in case theme is not properly loaded
   const isDark = theme?.name === 'dark';
-  
+
+  const navigate = useNavigate();
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   const themeColors = {
     primary: isDark ? '#e53e3e' : '#e53e3e', // Keep the same red for both themes
     secondary: isDark ? '#2d3748' : '#4a5568',
@@ -81,14 +90,14 @@ const AdminLayout = ({ children, pageTitle, pageDescription }) => {
                 </div>
               </div>
               
-              <Link
-                to="/login"
-                className="flex items-center px-4 py-2 rounded-md text-white"
+              <button
+                onClick={handleLogout}
+                className="flex items-center px-4 py-2 rounded-md text-white hover:scale-105 cursor-pointer"
                 style={{ backgroundColor: themeColors.secondary }}
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
-              </Link>
+              </button>
             </div>
           </div>
 

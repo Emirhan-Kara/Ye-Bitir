@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import RecipeCard from './RecipeCard';
 import { motion } from 'framer-motion';
 import './SearchPage.css';
@@ -17,6 +18,7 @@ const AnimatedFoodIconsBackground = React.memo(({ count }) => {
 
 const SearchPage = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate(); // Initialize the navigate function
   
   // State for recipes
   const [recipes, setRecipes] = useState([]);
@@ -84,6 +86,14 @@ const SearchPage = () => {
   // Toggle mobile filters
   const toggleMobileFilters = () => {
     setShowMobileFilters(!showMobileFilters);
+  };
+
+  // Handle recipe card click to navigate to recipe details
+  const handleRecipeClick = (recipeId) => {
+    // Navigate to the recipe detail page
+    navigate(`/recipe/${recipeId}`);
+    // Scroll to top for better user experience
+    window.scrollTo(0, 0);
   };
   
   // Load recipes (for demo, we'll generate some mock data)
@@ -186,11 +196,16 @@ const SearchPage = () => {
     ];
     
     const images = [
-      "/api/placeholder/320/240",
-      "/api/placeholder/320/240",
-      "/api/placeholder/320/240"
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8l9oRLw7lTlYD_XG3ddN83hOsJz8vxMazjQ&s",
+      "https://veganwithgusto.com/wp-content/uploads/2021/05/vegan-Thai-curry-in-bowl-with-fork-and-spoon.jpg",
+      "https://ohsweetbasil.com/wp-content/uploads/how-to-make-authentic-margherita-pizza-at-home-recipe-6-327x491.jpg",
+      "https://www.seriouseats.com/thmb/NL2ZMEcQs_51g1Lk06C0Hlf_xqA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__images__2016__06__20160702-salmon-rice-bowl3-30cfd40dfc5941d8b992f5fbb543031c.jpg",
+      "https://cdn.loveandlemons.com/wp-content/uploads/2023/08/vegetarian-stuffed-peppers.jpg",
+      "https://www.sweetteaandthyme.com/wp-content/uploads/2023/11/truffle-mushroom-risotto-overhead-close.jpg",
+      "https://fedbysab.com/wp-content/uploads/2021/11/Mexican-Street-Corn-Chicken-Tacos-1.jpg",
+      "https://www.wellseasonedstudio.com/wp-content/uploads/2023/06/Honey-garlic-salmon-fillet-on-bed-of-white-rice-and-side-of-bokchoy-on-plate-with-fork.jpg",
+      "https://cdn.loveandlemons.com/wp-content/uploads/2020/06/IMG_25456.jpg",
     ];
-
     return Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       title: recipeTitles[i % recipeTitles.length],
@@ -562,7 +577,12 @@ const SearchPage = () => {
                 animate="visible"
               >
                 {displayRecipes.map(recipe => (
-                  <motion.div key={recipe.id} variants={cardVariants}>
+                  <motion.div 
+                    key={recipe.id} 
+                    variants={cardVariants}
+                    onClick={() => handleRecipeClick(recipe.id)} // Add click handler here
+                    className="cursor-pointer" // Add cursor pointer for better UX
+                  >
                     <RecipeCard
                       title={recipe.title}
                       image={recipe.image}

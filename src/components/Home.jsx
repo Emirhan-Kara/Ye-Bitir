@@ -228,23 +228,22 @@ const Home = () => {
   return (
     <div 
       ref={containerRef}
-      className="home-container min-h-screen relative overflow-hidden"
+      className="home-container"
       style={{ backgroundColor: theme.core.background, color: theme.core.text }}
     >
       {/* AnimatedFoodIconsBackground */}
       <AnimatedFoodIconsBackground count={120} />
       
       {/* Edgy shapes that respond to mouse movement */}
-      <div className="edgy-shapes-container absolute inset-0 z-0">
+      <div className="edgy-shapes-container">
         {generateEdgyShapes()}
       </div>
       
       {/* Main content container */}
-      <div className="content-container relative z-10 max-w-6xl mx-auto py-12 px-4 mt-8">
+      <div className="content-container">
         <div className="hero-section text-center mb-12">
-          <h1 className="edgy-title text-5xl font-bold mb-4 animate-fadeIn">
-            <span style={{ color: theme.headerfooter.logoRed }}>Ye</span>
-            <span>Bitir</span>
+          <h1 className="edgy-title font-bold mb-4 animate-fadeIn">
+            Ye Bitir
           </h1>
           <p className="text-xl mb-8 animate-fadeIn delay-200">
             Discover, share, and savor amazing recipes!
@@ -289,7 +288,7 @@ const Home = () => {
         <div className="flex justify-center mt-10">
             <button 
               onClick={() => navigateTo('/recipe-wheel')}
-              className="recipe-wheel-btn flex items-center gap-2 px-6 py-3 transform hover:scale-105 transition-transform duration-200 edgy-corner"
+              className="recipe-wheel-btn flex items-center gap-2 px-6 py-3 transform hover:scale-115 transition-transform duration-200 cursor-pointer"
               style={{ 
                 backgroundColor: theme.headerfooter.logoRed,
                 color: theme.recipecard.componentText
@@ -350,7 +349,7 @@ const Home = () => {
             ].map((cuisine, index) => (
               <div 
                 key={`cuisine-${index}`} 
-                className="category-card relative overflow-hidden cursor-pointer animate-float"
+                className="category-card relative overflow-hidden cursor-pointer animate-float hover:scale-110"
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => navigateTo(`/recipes?cuisine=${cuisine.name}`)}
               >
@@ -384,7 +383,7 @@ const Home = () => {
                 }}
                 onClick={() => navigateTo(`/recipes?mealType=${mealType.name}`)}
               >
-                <div className="icon-container mb-2 text-center" style={{ color: theme.headerfooter.logoRed }}>
+                <div className="icon-container mb-2 text-center hover:scale-110" style={{ color: theme.headerfooter.logoRed }}>
                   {mealType.icon}
                 </div>
                 <h3 className="text-lg font-semibold">{mealType.name}</h3>
@@ -455,7 +454,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row justify-center items-center gap-6">
             <button 
               onClick={() => navigateTo('/recipes')}
-              className="cursor-pointer action-button flex items-center gap-2 px-8 py-4 edgy-corner transform hover:scale-115 transition-transform duration-200 text-center"
+              className="cursor-pointer action-button flex items-center gap-2 px-8 py-4 edgy-corner transform hover:scale-105 transition-transform duration-200 text-center"
               style={{ 
                 backgroundColor: theme.core.containerHoover,
                 color: theme.core.text
@@ -467,7 +466,7 @@ const Home = () => {
             
             <button 
               onClick={() => navigateTo('/add-recipe')}
-              className="cursor-pointer action-button flex items-center gap-2 px-8 py-4 edgy-corner transform hover:scale-115 transition-transform duration-200 text-center"
+              className="cursor-pointer action-button flex items-center gap-2 px-8 py-4 edgy-corner transform hover:scale-105 transition-transform duration-200 text-center"
               style={{ 
                 backgroundColor: theme.headerfooter.logoRed,
                 color: theme.recipecard.componentText
@@ -479,48 +478,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-      
-      {/* Add additional CSS styles */}
-      <style jsx>{`
-        .bg-pattern {
-          background-image: radial-gradient(currentColor 1px, transparent 1px);
-          background-size: 40px 40px;
-        }
-        
-        .edgy-input {
-          border-radius: 0;
-          clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
-        }
-        
-        .edgy-button {
-          border-radius: 0;
-          clip-path: polygon(5% 0, 100% 0, 100% 100%, 0% 100%);
-        }
-        
-        .category-card {
-          clip-path: polygon(5% 0, 95% 0, 100% 10%, 100% 90%, 95% 100%, 5% 100%, 0% 90%, 0% 10%);
-          transition: all 0.3s ease;
-        }
-        
-        .category-card:hover {
-          transform: scale(1.05);
-        }
-        
-        .edgy-title {
-          position: relative;
-        }
-        
-        .edgy-title:after {
-          content: '';
-          position: absolute;
-          bottom: -10px;
-          left: 0;
-          width: 100%;
-          height: 4px;
-          background: ${theme.headerfooter.logoRed};
-          clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
-        }
-      `}</style>
     </div>
   );
 };

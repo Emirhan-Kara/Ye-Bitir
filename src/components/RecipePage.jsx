@@ -221,7 +221,7 @@ const RecipePage = ({
           <ul className="mb-10 space-y-2">
             {ingredients.map((ingredient, index) => (
               <li key={index} className="flex items-baseline">
-                <span className="text-yellow-400 mr-2">•</span>
+                <span className="text-yellow-800 mr-2">•</span>
                 {ingredient}
               </li>
             ))}

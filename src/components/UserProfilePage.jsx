@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import RecipeCard from './RecipeCard';
-import { motion } from 'framer-motion';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
+import { getUserProfile, getUserRecipes } from '../services/ApiService';
 
 // Memoized AnimatedFoodIconsBackground component to prevent re-renders
 const AnimatedFoodIconsBackground = React.memo(({ count }) => {
@@ -21,6 +21,7 @@ const UserProfilePage = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [userRecipes, setUserRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Animation variants for Framer Motion
   const containerVariants = {
@@ -45,125 +46,31 @@ const UserProfilePage = () => {
     }
   };
 
-  // Fetch user profile and recipes (mock data for demo)
+  // Fetch user profile and recipes from backend
   useEffect(() => {
-    // Simulate API fetch delay
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
       
       try {
-        // In a real app, you would fetch from an API
-        // For demo, we'll use mock data
-        
-        // First, create some mock recipes no matter what
-        // This ensures every user profile will work
-        const mockUserRecipes = generateMockRecipes(username);
-        
-        // Check if we have recipes in localStorage (for users with recipes)
-        const savedRecipes = JSON.parse(localStorage.getItem('myRecipes')) || [];
-        const matchingRecipes = savedRecipes.filter(recipe => 
-          recipe.owner && recipe.owner.toLowerCase() === username.toLowerCase() || 
-          recipe.fullRecipe?.author && recipe.fullRecipe.author.toLowerCase() === username.toLowerCase()
-        );
-        
-        // Combine saved recipes with mock recipes if needed
-        const allUserRecipes = matchingRecipes.length > 0 ? matchingRecipes : mockUserRecipes;
-        setUserRecipes(allUserRecipes);
-        
-        // Calculate average rating
-        const totalRating = allUserRecipes.reduce((sum, recipe) => sum + parseFloat(recipe.rating || 0), 0);
-        const avgRating = allUserRecipes.length > 0 ? 
-          (totalRating / allUserRecipes.length).toFixed(1) : "N/A";
-        
-        // Generate profile data
-        setUserProfile({
-          username: username,
-          name: formatName(username),
-          joinDate: "2025-01-15",
-          bio: `Food enthusiast and recipe creator from Istanbul.`,
-          recipesCount: allUserRecipes.length,
-          avgRating: avgRating,
-          // For a real app, you'd have a proper image URL
-          profileImage: "/api/placeholder/150/150"
-        });
+        // Fetch user profile
+        const profileData = await getUserProfile(username);
+        setUserProfile(profileData);
+
+        // Fetch user's recipes
+        const recipesData = await getUserRecipes(username);
+        setUserRecipes(recipesData);
         
         setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setError("Failed to load user data. Please try again later.");
         setLoading(false);
       }
     };
     
     fetchData();
   }, [username]);
-
-  // Helper function to generate realistic-looking names from usernames
-  const formatName = (username) => {
-    // If the username looks like a real name (has capital first letter), use it directly
-    if (/^[A-Z][a-z]+$/.test(username)) {
-      return username;
-    }
-    
-    // If the username has camelCase (like johnDoe), split it
-    if (/^[a-z]+[A-Z][a-z]+$/.test(username)) {
-      return username.replace(/([A-Z])/g, ' $1')
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-    }
-    
-    // Otherwise just capitalize first letter of each word separated by non-alphanumeric chars
-    return username
-      .split(/[^a-zA-Z0-9]/)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-  };
-
-  // Helper to generate mock recipes based on username
-  const generateMockRecipes = (username) => {
-    // Recipe titles to use for any user
-    const commonRecipes = [
-      "Traditional Turkish Baklava", 
-      "Homemade Lahmacun", 
-      "Spicy Adana Kebab", 
-      "Turkish Rice Pudding", 
-      "Stuffed Grape Leaves"
-    ];
-    
-    // Custom recipes for specific users
-    const specificRecipes = {
-      'emirhan': ["Iskender Kebab with Yogurt", "Modern Turkish Pizza", "Istanbul Street Corn"],
-      'zaid': ["Spicy Chicken Köfte", "Middle Eastern Shawarma", "Turkish Breakfast Plate"],
-      'rumeysa': ["Sweet Kunefe", "Turkish Apple Tea", "Stuffed Bell Peppers"],
-      'hcavdar': ["Manti with Garlic Yogurt", "Turkish Red Lentil Soup", "Authentic Pide"],
-      'hayrunnisa': ["Creamy Tomato Çorba", "Cheese Börek", "Turkish Delight"],
-      'mervedeniz': ["Seafood Pilaf", "Mediterranean Salad", "Fig and Walnut Dessert"],
-      'ahmetyilmaz': ["Grilled Köfte", "Homemade Ayran", "Traditional Lokum"],
-      'zeynepkaya': ["Vegetarian Imam Bayildi", "Rose Lokum", "Turkish Tea Biscuits"],
-      'unknown': ["Mystery Recipe", "Chef's Special", "Secret Family Recipe"]
-    };
-    
-    // Try to get specific recipes for this user (lowercase to handle case-insensitivity)
-    const userLower = username.toLowerCase();
-    const userSpecificRecipes = specificRecipes[userLower] || [];
-    
-    // Combine the common recipes with any user-specific ones
-    const allRecipeTitles = [...commonRecipes, ...userSpecificRecipes];
-    
-    // Determine how many recipes to show (between 2-4)
-    const count = Math.max(2, Math.min(allRecipeTitles.length, 4));
-    
-    // Generate the mock recipes
-    return Array.from({ length: count }, (_, i) => ({
-      id: i + 1000 + Date.now() % 1000, // Use high IDs to avoid collision with real recipes
-      title: allRecipeTitles[i % allRecipeTitles.length],
-      image: "/api/placeholder/320/240",
-      timeInMins: Math.floor(Math.random() * 120) + 10,
-      rating: ((Math.random() * 1.5) + 3.5).toFixed(1), // Between 3.5 and 5.0
-      servings: Math.floor(Math.random() * 6) + 1,
-      owner: username
-    }));
-  };
 
   // Function to render rating stars
   const renderStars = (rating) => {
@@ -233,8 +140,27 @@ const UserProfilePage = () => {
     );
   }
 
-  // We'll always create a profile for any user, so this condition won't be needed
-  // But keeping it just in case something goes wrong
+  if (error) {
+    return (
+      <div 
+        className="min-h-screen flex justify-center items-center"
+        style={{ backgroundColor: theme.core.background, color: theme.core.text }}
+      >
+        <div className="text-center p-8 rounded-lg" style={{ backgroundColor: theme.core.container }}>
+          <h2 className="text-2xl font-bold mb-2">Error</h2>
+          <p className="mb-4">{error}</p>
+          <Link 
+            to="/" 
+            className="px-4 py-2 rounded-md"
+            style={{ backgroundColor: theme.headerfooter.logoRed, color: '#fff' }}
+          >
+            Return Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (!userProfile) {
     return (
       <div 
@@ -247,12 +173,9 @@ const UserProfilePage = () => {
           <Link 
             to="/" 
             className="px-4 py-2 rounded-md"
-            style={{ 
-              backgroundColor: theme.headerfooter.logoRed, 
-              color: 'white'
-            }}
+            style={{ backgroundColor: theme.headerfooter.logoRed, color: '#fff' }}
           >
-            Return to Home
+            Return Home
           </Link>
         </div>
       </div>
@@ -425,12 +348,13 @@ const UserProfilePage = () => {
       </div>
       
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .bg-pattern {
           background-image: radial-gradient(currentColor 1px, transparent 1px);
           background-size: 40px 40px;
         }
-      `}</style>
+      `}} />
     </div>
   );
 };

@@ -75,12 +75,15 @@
 
 /* Card and category styling */
 .category-card {
-  clip-path: polygon(5% 0, 95% 0, 100% 10%, 100% 90%, 95% 100%, 5% 100%, 0% 90%, 0% 10%);
+  background-color: rgba(255, 255, 255, 0.9);
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .category-card:hover {
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .category-overlay {
@@ -92,7 +95,8 @@
 }
 
 .recipe-wheel-btn {
-  clip-path: polygon(5% 0, 95% 0, 100% 15%, 100% 85%, 95% 100%, 5% 100%, 0 85%, 0 15%);
+  position: relative;
+  z-index: 1;
 }
 
 .category-box {
@@ -100,7 +104,16 @@
 }
 
 .ingredient-tag {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.ingredient-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Animation classes */
@@ -142,10 +155,9 @@
 
 /* Reveal animation classes */
 .reveal {
-  position: relative;
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 1s ease;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
 }
 
 .reveal.active {
@@ -212,4 +224,27 @@
 
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.edgy-shape {
+  pointer-events: none;
+}
+
+/* Ensure content is above background shapes */
+.relative {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure proper stacking context */
+.min-h-screen {
+  position: relative;
+  z-index: 0;
+}
+
+/* Add container background for better readability */
+.category-card, 
+.ingredient-tag,
+.recipe-wheel-btn {
+  backdrop-filter: blur(5px);
 }

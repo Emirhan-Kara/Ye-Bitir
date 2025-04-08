@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, UtensilsCrossed, Clock, Salad, Cherry, Shuffle, Share2, ArrowRight } from 'lucide-react';
+import { Search, UtensilsCrossed, Clock, Salad, Cherry, Shuffle } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
 import RecipeCard from './RecipeCard';
 import './Home.css';
+import { getAllRecipes } from '../services/ApiService';
 
 // Custom navigation function that ensures scroll to top
 const useCustomNavigate = () => {
@@ -38,6 +39,9 @@ const Home = () => {
     height: window.innerHeight
   });
   const [searchQuery, setSearchQuery] = useState('');
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   // Track mouse position for responsive shapes
   useEffect(() => {
@@ -220,10 +224,34 @@ const Home = () => {
   const handleSearch = (e) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      navigateTo(`/recipes`);
+      navigateTo(`/recipes?query=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
     }
   };
+
+  // Fetch recipes from backend
+  const fetchRecipes = async () => {
+    try {
+      setLoading(true);
+      const recipesData = await getAllRecipes();
+      
+      if (!Array.isArray(recipesData)) {
+        setRecipes([]);
+      } else {
+        setRecipes(recipesData);
+      }
+      
+    } catch {
+      setError('Failed to load recipes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch recipes on component mount
+  useEffect(() => {
+    fetchRecipes();
+  }, []);
   
   return (
     <div 
@@ -256,7 +284,7 @@ const Home = () => {
                 <input 
                   type="text" 
                   placeholder="Search recipes..." 
-                  className={`w-full p-3 pl-10 transition-all duration-300 ${windowSize.width < 640 ? 'edgy-input' : 'rounded-l-lg'}`}
+                  className={`w-full p-3 transition-all duration-300 ${windowSize.width < 640 ? 'edgy-input' : 'rounded-l-lg'}`}
                   style={{
                     backgroundColor: theme.headerfooter.searchBox,
                     color: theme.core.text,
@@ -265,9 +293,6 @@ const Home = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className="absolute left-3 top-3">
-                  <Search size={18} color={theme.core.text} />
-                </div>
               </div>
               <button 
                 type="submit" 
@@ -300,41 +325,37 @@ const Home = () => {
           </div>
 
         {/* Featured recipes section */}
-        <div className="featured-section mt-16 reveal">
+        <div className="featured-section mt-24 reveal">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold edgy-heading mx-auto">
               Featured Recipes
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
-            {[
-              { id: 1, title: "Mediterranean Grilled Chicken Salad", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8l9oRLw7lTlYD_XG3ddN83hOsJz8vxMazjQ&s", timeInMins: 35, rating: 4.7, servings: 2 },
-              { id: 2, title: "Spicy Thai Red Curry with Vegetables", image: "https://veganwithgusto.com/wp-content/uploads/2021/05/vegan-Thai-curry-in-bowl-with-fork-and-spoon.jpg", timeInMins: 40, rating: 4.9, servings: 4 },
-              { id: 3, title: "Classic Italian Margherita Pizza", image: "https://ohsweetbasil.com/wp-content/uploads/how-to-make-authentic-margherita-pizza-at-home-recipe-6-327x491.jpg", timeInMins: 55, rating: 4.8, servings: 3 },
-              { id: 4, title: "Japanese Teriyaki Salmon Bowl", image: "https://www.seriouseats.com/thmb/NL2ZMEcQs_51g1Lk06C0Hlf_xqA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__images__2016__06__20160702-salmon-rice-bowl3-30cfd40dfc5941d8b992f5fbb543031c.jpg", timeInMins: 30, rating: 4.6, servings: 2 },
-              { id: 5, title: "Vegetarian Stuffed Bell Peppers", image: "https://cdn.loveandlemons.com/wp-content/uploads/2023/08/vegetarian-stuffed-peppers.jpg", timeInMins: 45, rating: 4.5, servings: 4 },
-              { id: 6, title: "Creamy Mushroom Risotto", image: "https://www.sweetteaandthyme.com/wp-content/uploads/2023/11/truffle-mushroom-risotto-overhead-close.jpg", timeInMins: 50, rating: 4.8, servings: 4 },
-              { id: 7, title: "Mexican Street Corn Tacos", image: "https://fedbysab.com/wp-content/uploads/2021/11/Mexican-Street-Corn-Chicken-Tacos-1.jpg", timeInMins: 25, rating: 4.7, servings: 3 },
-              { id: 8, title: "Honey Garlic Glazed Salmon", image: "https://www.wellseasonedstudio.com/wp-content/uploads/2023/06/Honey-garlic-salmon-fillet-on-bed-of-white-rice-and-side-of-bokchoy-on-plate-with-fork.jpg", timeInMins: 20, rating: 4.9, servings: 2 },
-              { id: 9, title: "Vegan Buddha Bowl", image: "https://cdn.loveandlemons.com/wp-content/uploads/2020/06/IMG_25456.jpg", timeInMins: 35, rating: 4.7, servings: 1 }
-            ].map((recipe) => (
-              <div key={`recipe-${recipe.id}`} onClick={() => navigateTo(`/recipe/${recipe.id}`)} className="cursor-pointer">
-                <RecipeCard 
-                  title={recipe.title}
-                  image={recipe.image} 
-                  timeInMins={recipe.timeInMins}
-                  rating={recipe.rating}
-                  servings={recipe.servings}
-                />
-              </div>
-            ))}
+            {loading ? (
+              <div className="col-span-full text-center py-10">Loading recipes...</div>
+            ) : error ? (
+              <div className="col-span-full text-center py-10">Error loading recipes</div>
+            ) : recipes.length > 0 ? (
+              recipes.slice(0, 9).map((recipe) => (
+                <div key={`recipe-${recipe.id}`} onClick={() => navigateTo(`/recipe/${recipe.id}`)} className="cursor-pointer">
+                  <RecipeCard 
+                    title={recipe.title}
+                    image={recipe.image} 
+                    timeInMins={recipe.timeInMins}
+                    rating={recipe.rating}
+                    servings={recipe.servings}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-10">No recipes found</div>
+            )}
           </div>
-          
-          
         </div>
         
         {/* Cuisines section */}
-        <div className="cuisines-section mt-16 reveal">
+        <div className="cuisines-section mt-24 reveal">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold edgy-heading mx-auto">Explore Cuisines</h2>
           </div>
@@ -363,7 +384,7 @@ const Home = () => {
         </div>
         
         {/* Meal Types section */}
-        <div className="meal-types-section mt-16 reveal">
+        <div className="meal-types-section mt-24 reveal">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold edgy-heading mx-auto">Meal Types</h2>
           </div>
@@ -393,7 +414,7 @@ const Home = () => {
         </div>
         
         {/* Dietary Preferences section */}
-        <div className="diet-section mt-16 reveal">
+        <div className="diet-section mt-24 reveal">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold edgy-heading mx-auto">Dietary Preferences</h2>
           </div>
@@ -425,7 +446,7 @@ const Home = () => {
         </div>
         
         {/* Main Ingredients section */}
-        <div className="ingredients-section mt-16 reveal">
+        <div className="ingredients-section mt-24 reveal">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold edgy-heading mx-auto">Main Ingredients</h2>
           </div>
@@ -450,7 +471,7 @@ const Home = () => {
         </div>
         
         {/* Bottom Action Buttons */}
-        <div className="action-buttons-section mt-16 mb-16 reveal">
+        <div className="action-buttons-section mt-32 mb-24 reveal">
           <div className="flex flex-col md:flex-row justify-center items-center gap-6">
             <button 
               onClick={() => navigateTo('/recipes')}
@@ -461,19 +482,6 @@ const Home = () => {
               }}
             >
               <span className="font-bold">Explore All Recipes</span>
-              <ArrowRight size={20} />
-            </button>
-            
-            <button 
-              onClick={() => navigateTo('/add-recipe')}
-              className="cursor-pointer action-button flex items-center gap-2 px-8 py-4 edgy-corner transform hover:scale-105 transition-transform duration-200 text-center"
-              style={{ 
-                backgroundColor: theme.headerfooter.logoRed,
-                color: theme.recipecard.componentText
-              }}
-            >
-              <Share2 size={20} />
-              <span className="font-bold">Share Your Recipe</span>
             </button>
           </div>
         </div>
@@ -482,4 +490,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Home; 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
 import ThemeToggle from './ThemeToggle';
-import { User, Mail, Lock, KeyRound, UserPlus } from 'lucide-react';
+import { User, Mail, Lock, KeyRound, UserPlus, AlertCircle } from 'lucide-react';
 import './SignUp.css';
 
 // Reuse the AnimatedFoodIconsBackground from Home
@@ -17,12 +18,19 @@ const AnimatedFoodIconsBackground = React.memo(({ count }) => {
 });
 
 const SignUp = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [generalError, setGeneralError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const { theme } = useTheme();
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [windowSize, setWindowSize] = useState({
@@ -59,31 +67,104 @@ const SignUp = () => {
     };
   }, []);
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/\d/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one number';
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    }
+    
+    // Confirm password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setGeneralError('');
+    setSuccessMessage('');
     
-    // Basic validation
-    if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+    if (!validateForm()) {
       return;
     }
     
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
+    setIsLoading(true);
+    
+    try {
+      const result = await register(
+        formData.name.trim(),
+        formData.email.trim().toLowerCase(),
+        formData.password
+      );
+      
+      if (result.success) {
+        // Set success message and keep form disabled
+        setSuccessMessage('Registration successful! Redirecting to login...');
+        setIsLoading(true); 
+        
+        // Force a 2-second delay before navigation
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setGeneralError(result.message || 'Registration failed. Please try again.');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      if (err.message.includes('already exists')) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'This email is already registered'
+        }));
+      } else {
+        setGeneralError('An error occurred during registration. Please try again.');
+      }
+      setIsLoading(false);
     }
-    
-    // Password strength validation
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-    
-    // You would typically handle sign up here
-    console.log('Sign up attempted with:', { name, email, password });
-    
-    // For testing, simulate successful sign up
-    alert('Sign up successful (test)');
   };
 
   // Calculate position for edgy shapes based on mouse position
@@ -214,8 +295,8 @@ const SignUp = () => {
               </span>
             </Link>
           </div>
-          <h2 className="mt-6 text-center text-xl font-extrabold relative z-10 animate-fadeIn">
-            <span className="relative edgy-title">Create account</span>
+          <h2 className="mt-6 text-center text-2xl font-extrabold relative z-10 animate-fadeIn">
+            <span className="relative edgy-title">Create Account</span>
           </h2>
         </div>
 
@@ -226,13 +307,39 @@ const SignUp = () => {
               backgroundColor: `${theme.core.containerHoover}80`
             }}
           >
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 animate-shake">
-                <p>{error}</p>
+            {/* Success Message - Force green with inline styles */}
+            {successMessage && (
+              <div 
+                className="mb-4 p-4 rounded-lg shadow-lg"
+                style={{
+                  backgroundColor: '#dcfce7', /* Light green background */
+                  borderWidth: '2px',
+                  borderStyle: 'solid',
+                  borderColor: '#16a34a', /* Medium green border */
+                  color: '#15803d', /* Dark green text */
+                  animation: 'successAnimation 0.5s ease-out forwards, successPulse 2s ease-in-out infinite'
+                }}
+              >
+                <p className="flex items-center justify-center text-lg font-medium">
+                  <svg className="w-6 h-6 mr-2" fill="none" stroke="#16a34a" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {successMessage}
+                </p>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {generalError && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded animate-shake">
+                <p className="flex items-center">
+                  <AlertCircle className="w-5 h-5 mr-2" />
+                  {generalError}
+                </p>
               </div>
             )}
             
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium">
                   Full Name
@@ -246,16 +353,18 @@ const SignUp = () => {
                     name="name"
                     type="text"
                     autoComplete="name"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="custom-input edgy-input"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={`custom-input edgy-input ${errors.name ? 'border-red-500' : ''}`}
                     style={{
                       backgroundColor: `${theme.headerfooter.searchBox}90`,
                       color: theme.core.text
                     }}
                   />
                 </div>
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600 animate-slideIn">{errors.name}</p>
+                )}
               </div>
 
               <div>
@@ -271,16 +380,18 @@ const SignUp = () => {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="custom-input edgy-input"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`custom-input edgy-input ${errors.email ? 'border-red-500' : ''}`}
                     style={{
                       backgroundColor: `${theme.headerfooter.searchBox}90`,
                       color: theme.core.text
                     }}
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600 animate-slideIn">{errors.email}</p>
+                )}
               </div>
 
               <div>
@@ -296,19 +407,18 @@ const SignUp = () => {
                     name="password"
                     type="password"
                     autoComplete="new-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="custom-input edgy-input"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`custom-input edgy-input ${errors.password ? 'border-red-500' : ''}`}
                     style={{
                       backgroundColor: `${theme.headerfooter.searchBox}90`,
                       color: theme.core.text
                     }}
                   />
                 </div>
-                <p className="mt-1 text-xs opacity-80">
-                  Password must be at least 8 characters
-                </p>
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-600 animate-slideIn">{errors.password}</p>
+                )}
               </div>
 
               <div>
@@ -324,28 +434,44 @@ const SignUp = () => {
                     name="confirmPassword"
                     type="password"
                     autoComplete="new-password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="custom-input edgy-input"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className={`custom-input edgy-input ${errors.confirmPassword ? 'border-red-500' : ''}`}
                     style={{
                       backgroundColor: `${theme.headerfooter.searchBox}90`,
                       color: theme.core.text
                     }}
                   />
                 </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600 animate-slideIn">{errors.confirmPassword}</p>
+                )}
               </div>
 
               <div>
                 <button
                   type="submit"
-                  className="signup-btn edgy-button"
+                  disabled={isLoading}
+                  className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ease-in-out transform hover:scale-[1.02]"
                   style={{ 
-                    backgroundColor: theme.headerfooter.logoRed
+                    backgroundColor: theme.headerfooter.logoRed,
+                    opacity: isLoading ? 0.7 : 1
                   }}
                 >
-                  <UserPlus size={18} />
-                  <span>Sign up</span>
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating account...
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={18} className="mr-2" />
+                      Sign up
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -353,44 +479,24 @@ const SignUp = () => {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
+                  <div className="w-full border-t" style={{ borderColor: `${theme.core.text}20` }}></div>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2" style={{ 
-                    backgroundColor: theme.core.containerHoover,
-                    color: theme.core.text
-                  }}>Or continue with</span>
+                <div className="relative flex justify-center text-sm ">
+                  <span className="px-2 py-1 rounded-xl" style={{ backgroundColor: theme.headerfooter.componentBg, color: theme.core.text }}>
+                    Already have an account?
+                  </span>
                 </div>
               </div>
 
-              <div className="mt-6">
-                <button
-                  onClick={() => console.log('Google sign-up clicked')}
-                  className="google-btn edgy-input"
-                  style={{ 
-                    backgroundColor: `${theme.headerfooter.searchBox}90`,
-                    color: theme.core.text
-                  }}
+              <div className="mt-6 text-center">
+                <Link
+                  to="/login"
+                  className="font-medium hover:underline transition-colors"
+                  style={{ color: theme.headerfooter.logoRed }}
                 >
-                  {/* Google logo */}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
-                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
-                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
-                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
-                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
-                  </svg>
-                  <span>Sign up with Google</span>
-                </button>
-              </div>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <p className="text-sm">
-                Already have an account?{' '}
-                <Link to="/login" className="font-medium hover:underline transition-colors" style={{ color: theme.headerfooter.logoRed }}>
-                  Log in
+                  Login to your account
                 </Link>
-              </p>
+              </div>
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ const Header = ({
   const navigate = useNavigate();
   
   const { theme } = useTheme();
-  const { isLoggedIn, currentUser } = useAuth(); // Get authentication state from context
+  const { isLoggedIn, isAdmin } = useAuth(); // Get authentication state and isAdmin from context
   
   useEffect(() => {
     const handleScroll = () => {
@@ -60,9 +60,6 @@ const Header = ({
       setIsSearchVisible(false);
     }
   };
-
-  // Check if user is admin
-  const isAdmin = currentUser?.role === 'admin';
 
   // Navigation items
   const navItems = [
@@ -189,7 +186,7 @@ const Header = ({
               </Link>
             ))}
             
-            {/* Profile/Login - Updated to check for admin role */}
+            {/* Profile/Login - Using isAdmin from context */}
             <Link 
               to={isLoggedIn ? (isAdmin ? "/admin" : "/profile") : "/login"} 
               className="flex flex-col items-center px-1 sm:px-2 md:px-3 lg:px-4 no-underline whitespace-nowrap group transform hover:scale-110 transition-transform duration-200"

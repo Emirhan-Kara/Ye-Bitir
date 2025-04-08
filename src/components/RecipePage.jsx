@@ -1,32 +1,163 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import ImageComponent from './ImageComponent';
 import CommentsSection from './CommentsSection';
 import SuggestionsSection from './SuggestionsSection';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import { deleteRecipe, getRecipeById, saveRecipe, unsaveRecipe, isRecipeSaved } from '../services/ApiService';
 
 // RecipePage component
-const RecipePage = ({ 
-  title, 
-  categories,
-  rating, 
-  servings, 
-  timeInMins,
-  headerImage,
-  ingredients,
-  instructions,
-  owner,
-  initialComments
-}) => {
+const RecipePage = (props) => {
+  const { recipeId } = useParams();
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { currentUser, token, isLoggedIn, isInitialized } = useAuth();
+
+  // Check if the current recipe is saved by the user
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      if (!isLoggedIn || !token || !recipeId) {
+        setIsBookmarked(false);
+        return;
+      }
+      
+      try {
+        const savedStatus = await isRecipeSaved(recipeId, token);
+        setIsBookmarked(savedStatus);
+      } catch (error) {
+        setIsBookmarked(false);
+        console.error("Error checking saved status:", error);
+      }
+    };
+    
+    checkSavedStatus();
+  }, [recipeId, token, isLoggedIn]);
+
+  useEffect(() => {
+    // If props are provided, use them
+    if (props.id) {
+      setRecipe(props);
+      setLoading(false);
+      return;
+    }
+    
+    // Otherwise fetch recipe data using recipeId from URL
+    const fetchRecipe = async () => {
+      try {
+        const data = await getRecipeById(recipeId);
+        
+        if (data.title === "Failed to parse recipe data" || 
+            data.title === "Recipe format unexpected" ||
+            data.title === "Error fetching recipe") {
+          setError(`Failed to load recipe: ${data.description}`);
+          setRecipe(null);
+        } else {
+          // Ensure data has all required properties with fallbacks
+          const processedRecipe = {
+            id: data.id || recipeId,
+            title: data.title || "Untitled Recipe",
+            description: data.description || "",
+            categories: data.categories || {},
+            rating: data.rating || 0,
+            servings: data.servings || 1,
+            timeInMins: data.timeInMins || 0,
+            ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+            instructions: Array.isArray(data.instructions) ? data.instructions : [],
+            image: data.image || "",
+            headerImage: data.headerImage || data.image || "",
+            owner: data.owner || {
+              username: "Anonymous",
+              profileImage: null,
+              joinDate: new Date().toISOString()
+            },
+            initialComments: Array.isArray(data.comments) ? data.comments : [],
+            createdAt: data.createdAt || new Date().toISOString()
+          };
+          
+          setRecipe(processedRecipe);
+          
+        }
+      } catch (err) {
+        setError(`Failed to load recipe: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (recipeId) {
+      fetchRecipe();
+    }
+  }, [recipeId, props, isInitialized]);
+  
   
   // Calculate stars based on rating
   const totalStars = 5;
+  const rating = recipe?.rating || 0;
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.3 && rating % 1 < 0.8;
   const emptyStars = totalStars - fullStars - (hasHalfStar ? 1 : 0);
+  
+  if (loading || !isInitialized) {
+    return <div className="text-center py-10">Loading...</div>;
+  }
+  
+  if (error || !recipe) {
+    return (
+      <div className="text-center py-10">
+        <h2 className="text-2xl text-red-500 mb-4">Recipe not found</h2>
+        <p className="text-gray-700">{error || "Recipe data is missing"}</p>
+        <Link to="/" className="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Return to Home
+        </Link>
+      </div>
+    );
+  }
+  
+  // Handle recipe deletion
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+      try {
+        await deleteRecipe(recipe.id, token);
+        navigate('/profile');
+      } catch {
+        alert('Failed to delete recipe. Please try again.');
+      }
+    }
+  };
+  
+  // Handle saving/unsaving recipe
+  const handleSaveRecipe = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isLoggedIn || !token) {
+      navigate('/login');
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      if (isBookmarked) {
+        await unsaveRecipe(recipeId, token);
+        setIsBookmarked(false);
+      } else {
+        await saveRecipe(recipeId, token);
+        setIsBookmarked(true);
+      }
+    } catch (error) {
+      console.error("Error saving/unsaving recipe:", error);
+      // Show error message to user
+      setError("Failed to save/unsave recipe. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   
   // Generate star elements for the rating
   const renderStars = () => {
@@ -113,11 +244,11 @@ const RecipePage = ({
     <div  className="w-full min-h-screen bg-gray-300"
           style={{ backgroundColor:theme.core.background, color: theme.core.text}}>
       {/* Image */}
-      <ImageComponent headerImage={headerImage}></ImageComponent><br />
+      <ImageComponent headerImage={recipe.headerImage}></ImageComponent><br />
       
       {/* Categories */}
       <div className="w-19/20 mx-auto flex flex-wrap justify-center rounded-2xl">
-        {categories && Object.entries(categories).map(([key, value], index) => (
+        {recipe.categories && Object.entries(recipe.categories).map(([key, value]) => (
           <CategoryButton 
             key={key} 
             label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} 
@@ -130,7 +261,7 @@ const RecipePage = ({
       <div
         className="w-16/20 mx-auto p-6 text-3xl font-bold text-center rounded-full"
         style={{ backgroundColor:theme.core.container, color: theme.text }}>
-        {title}
+        {recipe.title}
       </div>
       
       {/* Recipe Stats */}
@@ -160,7 +291,7 @@ const RecipePage = ({
           </svg>
 
           {/* Servings Text */}
-          <span>{servings} Servings</span>
+          <span>{recipe.servings || 1} Servings</span>
         </div>
 
         
@@ -171,7 +302,7 @@ const RecipePage = ({
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>{timeInMins} mins</span>
+          <span>{recipe.timeInMins || 0} mins</span>
         </div>
         
         {/* Comments */}
@@ -186,18 +317,52 @@ const RecipePage = ({
           <span>Comments</span>
         </button>
         
-        {/* Bookmark */}
-        <button
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className={`${isBookmarked ? 'bg-black' : 'bg-red-900'} ${isBookmarked ? 'brightness-60' : 'brightness-100'} hover:brightness-80 p-2 rounded-full flex items-center justify-center transition duration-200 cursor-pointer`}
-          aria-label={isBookmarked ? "Remove from favorites" : "Add to favorites"}
-          style={{ backgroundColor:theme.core.container, color: theme.text }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isBookmarked ? 0 : 2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-          </svg>
-        </button>
-      </div><br />
+        {/* Save Button - Only visible for logged in users */}
+        {isLoggedIn ? (
+          <button
+            onClick={handleSaveRecipe}
+            disabled={isSaving}
+            className={`hover:brightness-80 px-3 py-2 rounded-full flex items-center gap-2 transition duration-200 cursor-pointer ${isSaving ? 'opacity-70' : ''}`}
+            style={{ backgroundColor:theme.core.container, color: theme.text }}
+            title={isBookmarked ? "Unsave Recipe" : "Save Recipe"}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={isBookmarked ? "currentColor" : "none"} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isBookmarked ? 0 : 2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+            </svg>
+            <span>{isSaving ? "Processing..." : (isBookmarked ? "Saved" : "Save")}</span>
+          </button>
+        ) : (
+          <Link to="/login" 
+            className="hover:brightness-80 px-3 py-2 rounded-full flex items-center gap-2 transition duration-200 cursor-pointer"
+            style={{ backgroundColor:theme.core.container, color: theme.text }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            <span>Login to Save</span>
+          </Link>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="w-full text-center text-red-500 mt-2">
+            {error}
+          </div>
+        )}
+      </div>
+
+      {/* Recipe Actions */}
+      <div className="flex justify-center gap-4 mt-2 mb-4">
+        {isLoggedIn && currentUser && currentUser.username === recipe.owner.username && (
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors"
+          >
+            Delete Recipe
+          </button>
+        )}
+      </div>
+      <br />
       
       {/* Recipe Content */}
       <div  className="w-19/20 mx-auto rounded-[40px] p-[48px] grid grid-cols-1 md:grid-cols-5 gap-8"
@@ -206,45 +371,78 @@ const RecipePage = ({
         {/* Instructions*/}
         <div className="md:col-span-4">
           <h2 className="text-4xl font-bold mb-4">Instructions</h2>
-          {instructions.map((step, index) => (
-            <div key={index} className="mb-6">
-              <h3 className="text-2xl font-semibold mb-2">Step {index + 1}</h3>
-              <div className="w-4/5 border-t border-white mb-2"></div>
-              <p>{step}</p>
-            </div>
-          ))}
+          {Array.isArray(recipe.instructions) && recipe.instructions.length > 0 ? (
+            recipe.instructions.map((step, index) => (
+              <div key={index} className="mb-6">
+                <h3 className="text-2xl font-semibold mb-2">Step {index + 1}</h3>
+                <div className="w-4/5 border-t border-white mb-2"></div>
+                <p>{step}</p>
+              </div>
+            ))
+          ) : (
+            <p>No instructions available for this recipe.</p>
+          )}
         </div>
 
         {/* Ingredients and Owner */}
         <div className="md:col-span-1">
           <h2 className="text-3xl font-bold mb-4">Ingredients</h2>
-          <ul className="mb-10 space-y-2">
-            {ingredients.map((ingredient, index) => (
-              <li key={index} className="flex items-baseline">
-                <span className="text-yellow-800 mr-2">•</span>
-                {ingredient}
-              </li>
-            ))}
-          </ul>
+          {Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0 ? (
+            <ul className="mb-10 space-y-2">
+              {recipe.ingredients.map((ingredient, index) => (
+                <li key={`ingredient-${index}`} className="flex items-baseline">
+                  <span className="text-yellow-800 mr-2">•</span>
+                  {ingredient}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mb-10">No ingredients listed for this recipe.</p>
+          )}
 
           <h2 className="text-3xl font-bold mb-4">Recipe By</h2>
-          <div className="p-4 rounded-lg" style={{ backgroundColor: theme.core.containerHoover }}>
+          <div 
+            className="p-6 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl" 
+            style={{ backgroundColor: theme.core.containerHoover }}
+          >
             <Link 
-              to={`/profile/${owner}`} 
-              className="flex items-center hover:scale-105 transition-transform duration-300"
+              to={isLoggedIn && currentUser && currentUser.username === recipe.owner.username ? '/profile' : `/profile/${recipe.owner.username}`} 
+              className="flex flex-col items-center hover:scale-102 transition-transform duration-300"
             >
-              <div className="w-12 h-12 rounded-full bg-gray-300 mr-3 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={`/api/placeholder/50/50`} 
-                  alt={owner} 
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-20 h-20 rounded-full bg-gray-300 mb-4 flex items-center justify-center overflow-hidden border-4" style={{ borderColor: theme.headerfooter.logoRed }}>
+                {recipe.owner.profileImage ? (
+                  <img 
+                    src={recipe.owner.profileImage}
+                    alt={recipe.owner.username} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img 
+                    src={"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiNlMmUyZTIiLz48dGV4dCB4PSIyNSIgeT0iMjkiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzk5OTk5OSI+VTwvdGV4dD48L3N2Zz4="} 
+                    alt={recipe.owner.username} 
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </div>
-              <div>
-                <p className="font-bold text-lg" style={{ color: theme.headerfooter.logoRed }}>
-                  {owner}
+              <div className="text-center">
+                <p className="font-bold text-2xl mb-1" style={{ color: theme.headerfooter.logoRed }}>
+                  {recipe.owner.username}
                 </p>
-                <p className="text-sm">View Profile</p>
+                <div className="flex items-center justify-center gap-2 text-sm opacity-80 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Member since {new Date(recipe.owner.joinDate).toLocaleDateString()}</span>
+                </div>
+                <button 
+                  className="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200 hover:opacity-90"
+                  style={{ 
+                    backgroundColor: theme.headerfooter.logoRed,
+                    color: theme.core.container
+                  }}
+                >
+                  {isLoggedIn && currentUser && currentUser.username === recipe.owner.username ? 'View Your Profile' : 'View Profile'}
+                </button>
               </div>
             </Link>
           </div>
@@ -256,7 +454,10 @@ const RecipePage = ({
       <SuggestionsSection text='Suggestions'/><br />
 
       {/* Comments Section */}
-      <CommentsSection initialComments={initialComments}></CommentsSection><br />
+      <CommentsSection 
+        initialComments={recipe.initialComments || []}
+        recipeId={recipe.id}
+      />
     </div> 
   );
 };

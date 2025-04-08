@@ -2,9 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { motion as Motion } from 'framer-motion';
 import RecipeCard from './RecipeCard';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
-import { motion } from 'framer-motion';
+import { 
+  getUserProfile, 
+  getUserRecipes, 
+  getSavedRecipes,
+  updateUserProfile,
+  updateUserPassword,
+  deleteUserAccount,
+  updateProfilePicture
+} from '../services/ApiService';
+import { addSampleRecipes } from '../scripts/addSampleRecipes';
 
 // Memoized AnimatedFoodIconsBackground component to prevent re-renders
 const AnimatedFoodIconsBackground = React.memo(({ count }) => {
@@ -15,73 +25,59 @@ const AnimatedFoodIconsBackground = React.memo(({ count }) => {
     </div>
   );
 });
-const mockSavedRecipes = [
-  { 
-    id: 4, 
-    title: 'Creamy Pasta Carbonara with Pancetta', 
-    image: 'https://media.istockphoto.com/id/1358851353/photo/spaghetti-alla-carbonara-italian-pasta-dish-with-crispy-bacon-and-parmesan-in-a-black-bowl.jpg?s=612x612&w=0&k=20&c=NxQEpVLhVIhTRtTbfz3SBvZBfcKGh_PxH5-BaUX9dXg=', 
-    timeInMins: 25, 
-    rating: 4.8, 
-    servings: 2 
-  },
-  { 
-    id: 5, 
-    title: 'Authentic Chicken Curry with Basmati Rice', 
-    image: 'https://media.istockphoto.com/id/1345298959/photo/butter-chicken-or-murgh-makhani.jpg?s=612x612&w=0&k=20&c=_tOaCMQiL2s-8I_1JTohLcv4Jn-VYyPWz2Q6v2B8xP0=', 
-    timeInMins: 50, 
-    rating: 4.6, 
-    servings: 4
-  },
-  { 
-    id: 6, 
-    title: 'Mixed Berry Smoothie Bowl with Granola', 
-    image: 'https://media.istockphoto.com/id/1411248193/photo/healthy-yogurt-smoothie-bowl-with-berry-fruits.jpg?s=612x612&w=0&k=20&c=7Kew-NeHYIVz1cC7j-3BN0HYiGS-UCQFebaQ-RA2yzk=', 
-    timeInMins: 10, 
-    rating: 4.3, 
-    servings: 1
-  },
-];
 
 const ProfilePage = ({ initialTab = 'myRecipes' }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [userData, setUserData] = useState({
-    username: 'Hayrunnisa',
-    profileImage: "src/assets/nisa_profilepic.jpg",
-    bio: 'Food enjoyer from Kayseri/Türkiye',
-    recipesCount: 12,
-    savedCount: 34,
+    username: '',
+    profileImage: '',
+    bio: '',
+    recipesCount: 0,
+    savedCount: 0,
+    email: '',
+  });
+  const [myRecipes, setMyRecipes] = useState([]);
+  const [savedRecipes, setSavedRecipes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notification, setNotification] = useState({ type: '', message: '' });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    bio: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
   
-  // State for recipes - allows us to update them
-  const [myRecipes, setMyRecipes] = useState([
-    { 
-      id: 1, 
-      title: 'Homemade Pizza with Fresh Basil and Mozzarella', 
-      image: 'https://media.istockphoto.com/id/1349560847/photo/slice-of-hot-pizza-large-cheese-lunch-or-dinner-traditional-italian-food-takeaway-with-melted.jpg?s=612x612&w=0&k=20&c=tUiljxr0yvJ-qsagIwcaNgQD226n6ZYgQIrk1dGk-Zo=', 
-      timeInMins: 45, 
-      rating: 4.7, 
-      servings: 4 
-    },
-    { 
-      id: 2, 
-      title: 'Triple Chocolate Cake with Ganache', 
-      image: 'https://media.istockphoto.com/id/1311220995/photo/chocolate-birthday-cake-with-chocolate-frosting-and-sprinkles.jpg?s=612x612&w=0&k=20&c=b0qHFczx3TjUG0iKLUB9TN0VVKpFHXQs2tBfW7UO3XI=', 
-      timeInMins: 60, 
-      rating: 4.9, 
-      servings: 8 
-    },
-    { 
-      id: 3, 
-      title: 'Beef Stir Fry with Seasonal Vegetables', 
-      image: 'https://media.istockphoto.com/id/1309136478/photo/beef-stir-fry-with-green-beans-and-tomatoes.jpg?s=612x612&w=0&k=20&c=WmK_2s3HG2YwbfAzMu-U2GjSuYW_ZuTy9N77wZ_PJHA=', 
-      timeInMins: 30, 
-      rating: 4.5, 
-      servings: 2 
-    },
-  ]);
+  // Track original values for comparison
+  const [originalValues, setOriginalValues] = useState({
+    username: '',
+    bio: '',
+  });
+
+  // Add these new state variables after the existing state declarations
+  const [passwordValidation, setPasswordValidation] = useState({
+    length: false,
+    number: false,
+    uppercase: false,
+    different: false
+  });
+
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Check if profile has changes
+  const hasProfileChanges = () => {
+    return formData.username !== originalValues.username || formData.bio !== originalValues.bio;
+  };
+
+  // Check if password fields have values
+  const hasPasswordChanges = () => {
+    return formData.currentPassword || formData.newPassword || formData.confirmPassword;
+  };
 
   const { theme } = useTheme();
-  const { logout, currentUser } = useAuth();
+  const { logout, token, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   
   // Refs for scroll animations
@@ -95,39 +91,296 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
     navigate('/');
   };
 
-  // Update username based on user email if available
+  // Show notification
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification({ type: '', message: '' }), 5000); // Hide after 5 seconds
+  };
+
+  // Fetch user data and recipes
   useEffect(() => {
-    if (currentUser && currentUser.email) {
-      // Extract username from email (remove @domain.com)
-      const username = currentUser.email.split('@')[0];
-      // Update the userData with the email or username
+    const fetchUserData = async () => {
+      if (!isLoggedIn || !token) {
+        navigate('/login');
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        // Fetch user profile
+        const profileData = await getUserProfile(token);
+        setUserData(profileData);
+        
+        // Set both form data and original values
+        const newFormData = {
+          username: profileData.username || '',
+          bio: profileData.bio || '',
+        };
+        setFormData(prev => ({
+          ...prev,
+          ...newFormData
+        }));
+        setOriginalValues(newFormData);
+
+        // Fetch user's recipes
+        try {
+          console.log('Fetching user recipes...');
+          const recipesData = await getUserRecipes(token);
+          console.log('User recipes response:', recipesData);
+          
+          let processedRecipes = [];
+          
+          // Process recipes data based on various possible formats
+          if (Array.isArray(recipesData)) {
+            processedRecipes = recipesData;
+          } else if (recipesData && typeof recipesData === 'object') {
+            if (recipesData.data && Array.isArray(recipesData.data)) {
+              processedRecipes = recipesData.data;
+            } else if (recipesData.recipes && Array.isArray(recipesData.recipes)) {
+              processedRecipes = recipesData.recipes;
+            } else {
+              // Try to convert object with numeric keys to array
+              processedRecipes = Object.keys(recipesData)
+                .filter(key => !isNaN(key))
+                .map(key => recipesData[key]);
+            }
+          }
+          
+          setMyRecipes(processedRecipes);
+          setUserData(prev => ({
+            ...prev,
+            recipesCount: processedRecipes.length
+          }));
+        } catch (recipeErr) {
+          console.error('Error fetching user recipes:', recipeErr);
+          showNotification('error', 'Failed to load your recipes. Please try again later.');
+          setMyRecipes([]);
+        }
+
+        // Fetch saved recipes
+        try {
+          const savedRecipesData = await getSavedRecipes(token);
+          console.log('Fetched saved recipes data:', savedRecipesData);
+          
+          let processedSavedRecipes = [];
+          
+          if (Array.isArray(savedRecipesData)) {
+            processedSavedRecipes = savedRecipesData;
+          } else if (savedRecipesData && typeof savedRecipesData === 'object') {
+            if (savedRecipesData.data && Array.isArray(savedRecipesData.data)) {
+              processedSavedRecipes = savedRecipesData.data;
+            } else if (savedRecipesData.recipes && Array.isArray(savedRecipesData.recipes)) {
+              processedSavedRecipes = savedRecipesData.recipes;
+            } else if (savedRecipesData.savedRecipes && Array.isArray(savedRecipesData.savedRecipes)) {
+              processedSavedRecipes = savedRecipesData.savedRecipes;
+            } else {
+              // Try to convert object with numeric keys to array
+              processedSavedRecipes = Object.keys(savedRecipesData)
+                .filter(key => !isNaN(key))
+                .map(key => savedRecipesData[key]);
+            }
+          }
+          
+          // Clean up recipe data to ensure all recipes have the necessary properties
+          processedSavedRecipes = processedSavedRecipes.map(recipe => ({
+            id: recipe.id || recipe.recipeId,
+            title: recipe.title || 'Untitled Recipe',
+            image: recipe.image || recipe.headerImage || '',
+            timeInMins: recipe.timeInMins || 0,
+            rating: recipe.rating || 0,
+            servings: recipe.servings || 1
+          }));
+          
+          console.log('Processed saved recipes:', processedSavedRecipes);
+          setSavedRecipes(processedSavedRecipes);
+          setUserData(prev => ({
+            ...prev,
+            savedCount: processedSavedRecipes.length
+          }));
+        } catch (savedErr) {
+          console.error('Error fetching saved recipes:', savedErr);
+          showNotification('error', 'Failed to load your saved recipes. Please try again later.');
+          setSavedRecipes([]);
+        }
+
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+        if (err.message === 'No authentication token provided' || err.message.includes('403')) {
+          logout();
+          navigate('/login');
+          return;
+        }
+        showNotification('error', 'Failed to load user data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [isLoggedIn, token, navigate, logout]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle profile update
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setIsUpdating(true);
+
+    try {
+      const updatedProfile = await updateUserProfile(token, {
+        username: formData.username,
+        bio: formData.bio,
+      });
+
       setUserData(prev => ({
         ...prev,
-        username: username.charAt(0).toUpperCase() + username.slice(1), // Capitalize first letter
-        email: currentUser.email
+        username: updatedProfile.username,
+        bio: updatedProfile.bio,
       }));
-    }
-  }, [currentUser]);
-
-  // In a real app, this would fetch user data and recipes from an API
-  useEffect(() => {
-    // Load recipes from localStorage (for demo purposes)
-    try {
-      const storedRecipes = JSON.parse(localStorage.getItem('myRecipes'));
-      if (storedRecipes && storedRecipes.length > 0) {
-        // Update myRecipes with stored recipes
-        setMyRecipes([...storedRecipes, ...myRecipes.slice(0, Math.max(0, 3 - storedRecipes.length))]);
-        
-        // Update recipes count
-        setUserData(prev => ({
-          ...prev,
-          recipesCount: storedRecipes.length + myRecipes.length
-        }));
+      
+      // Update original values after successful update
+      setOriginalValues({
+        username: updatedProfile.username,
+        bio: updatedProfile.bio,
+      });
+      
+      showNotification('success', 'Profile updated successfully!');
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      if (err.message.includes('403')) {
+        logout();
+        navigate('/login');
+        return;
       }
-    } catch (error) {
-      console.error('Error loading recipes from localStorage:', error);
+      if (err.message.includes('Username is already taken')) {
+        showNotification('error', 'This username is already taken. Please choose another one.');
+      } else {
+        showNotification('error', 'Failed to update profile. Please try again.');
+      }
+    } finally {
+      setIsUpdating(false);
     }
-  }, []);
+  };
+
+  // Add this new function after the existing functions
+  const validatePasswordRequirements = (currentPassword, newPassword) => {
+    // Check if new password is different from current password
+    const isDifferent = currentPassword !== newPassword;
+    
+    // Check other requirements
+    const hasLength = newPassword.length >= 8;
+    const hasNumber = /\d/.test(newPassword);
+    const hasUppercase = /[A-Z]/.test(newPassword);
+    
+    // Update validation state
+    setPasswordValidation({
+      length: hasLength,
+      number: hasNumber,
+      uppercase: hasUppercase,
+      different: isDifferent
+    });
+    
+    // Return true if all requirements are met
+    return hasLength && hasNumber && hasUppercase && isDifferent;
+  };
+  
+  // Add this effect to validate password requirements when password fields change
+  useEffect(() => {
+    if (formData.newPassword) {
+      validatePasswordRequirements(formData.currentPassword, formData.newPassword);
+    }
+  }, [formData.currentPassword, formData.newPassword]);
+
+  // Handle password update
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setIsUpdating(true);
+
+    // Check if passwords match
+    if (formData.newPassword !== formData.confirmPassword) {
+      showNotification('error', 'New passwords do not match');
+      setIsUpdating(false);
+      return;
+    }
+    
+    // Check if all password requirements are met
+    const allRequirementsMet = validatePasswordRequirements(formData.currentPassword, formData.newPassword);
+    if (!allRequirementsMet) {
+      showNotification('error', 'Please meet all password requirements');
+      setIsUpdating(false);
+      return;
+    }
+
+    try {
+      await updateUserPassword(token, {
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
+      
+      showNotification('success', 'Password updated successfully!');
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      }));
+      
+      // Reset validation state
+      setPasswordValidation({
+        length: false,
+        number: false,
+        uppercase: false,
+        different: false
+      });
+    } catch (err) {
+      console.error('Error updating password:', err);
+      if (err.message.includes('403') || err.message.includes('permission')) {
+        logout();
+        navigate('/login');
+        return;
+      }
+      if (err.message.includes('incorrect')) {
+        showNotification('error', 'Current password is incorrect');
+      } else if (err.message.includes('same as the current password')) {
+        showNotification('error', 'New password cannot be the same as the current password');
+      } else {
+        showNotification('error', err.message || 'Failed to update password. Please try again.');
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsUpdating(true);
+
+    try {
+      await deleteUserAccount(token);
+      logout();
+      navigate('/');
+    } catch (err) {
+      console.error('Error deleting account:', err);
+      if (err.message.includes('403')) {
+        logout();
+        navigate('/login');
+        return;
+      }
+      showNotification('error', 'Failed to delete account. Please try again.');
+      setIsUpdating(false);
+    }
+  };
 
   // Scroll animation
   useEffect(() => {
@@ -148,7 +401,14 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
 
     const observer = new IntersectionObserver(handleIntersect, observerOptions);
     
-    if (myRecipesRef.current) observer.observe(myRecipesRef.current);
+    if (myRecipesRef.current) {
+      observer.observe(myRecipesRef.current);
+      // Force visibility of initial tab
+      if (activeTab === 'myRecipes') {
+        myRecipesRef.current.classList.add('animate-fade-in');
+        myRecipesRef.current.style.opacity = '1';
+      }
+    }
     if (savedRecipesRef.current) observer.observe(savedRecipesRef.current);
     if (settingsRef.current) observer.observe(settingsRef.current);
 
@@ -182,8 +442,72 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
     }
   };
 
+  const handleProfilePictureChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      showNotification('error', 'Please select an image file');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('error', 'Image size should not exceed 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const result = await updateProfilePicture(file, token);
+      if (result.success) {
+        setUserData(prev => ({
+          ...prev,
+          profileImage: result.profileImage
+        }));
+        showNotification('success', 'Profile picture updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      showNotification('error', error.message || 'Failed to update profile picture. Please try again.');
+    } finally {
+      setIsUploading(false);
+      // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleProfilePictureClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.core.background }}>
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2" style={{ borderColor: theme.headerfooter.logoRed }}></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen overflow-hidden" style={{ backgroundColor: theme.core.background, color: theme.core.text }}>
+      {/* Notification popup */}
+      {notification.message && (
+        <div 
+          className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-500 transform translate-y-0 ${
+            notification.type === 'error' ? 'bg-red-500' : 'bg-green-500'
+          }`}
+          style={{
+            animation: 'slideIn 0.5s ease-out'
+          }}
+        >
+          <p className="text-white font-medium">{notification.message}</p>
+        </div>
+      )}
+
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 bg-pattern opacity-5"></div>
@@ -193,7 +517,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
 
       <div className="container mx-auto px-4 py-8 max-w-6xl relative z-10">
         {/* Profile Header */}
-        <motion.div 
+        <Motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -202,26 +526,45 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
         >
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex flex-col md:flex-row items-center">
-              <motion.div 
+              <Motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 mb-4 md:mb-0 md:mr-6 relative group"
               >
-                <img 
-                  src={userData.profileImage || "src/assets/nisa_profilepic.jpg"} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
                 <div 
-                  className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                  style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+                  className="w-full h-full rounded-full overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={handleProfilePictureClick}
                 >
-                  <span style={{ color: '#fff' }} className="text-sm font-medium">Change Photo</span>
+                  {userData.profileImage ? (
+                    <img
+                      src={`data:image/jpeg;base64,${userData.profileImage}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
+                      <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
-              </motion.div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleProfilePictureChange}
+                />
+                {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  </div>
+                )}
+              </Motion.div>
               <div className="flex-1 text-center md:text-left">
-                <motion.h1 
+                <Motion.h1 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
@@ -229,8 +572,8 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                   style={{ color: theme.core.text }}
                 >
                   {userData.username}
-                </motion.h1>
-                <motion.p 
+                </Motion.h1>
+                <Motion.p 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4, duration: 0.5 }}
@@ -238,8 +581,8 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                   className="mb-4"
                 >
                   {userData.bio}
-                </motion.p>
-                <motion.div 
+                </Motion.p>
+                <Motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
@@ -253,12 +596,12 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                     <p className="font-semibold" style={{ color: theme.core.text }}>{userData.savedCount}</p>
                     <p className="text-sm" style={{ color: theme.core.text, opacity: 0.7 }}>Saved</p>
                   </div>
-                </motion.div>
+                </Motion.div>
               </div>
             </div>
             
             {/* Add New Recipe button and Logout button positioned to the right */}
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -298,12 +641,12 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                 </svg>
                 Logout
               </button>
-            </motion.div>
+            </Motion.div>
           </div>
-        </motion.div>
+        </Motion.div>
 
         {/* Tabs */}
-        <motion.div 
+        <Motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -342,56 +685,120 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
               Settings
             </button>
           </div>
-        </motion.div>
+        </Motion.div>
 
         {/* Content based on active tab */}
         {activeTab === 'myRecipes' && (
-          <div ref={myRecipesRef} className="opacity-0 transition-opacity duration-1000 px-6">
-            <motion.div 
+          <div ref={myRecipesRef} className="transition-opacity duration-1000 px-6"
+               style={{ opacity: isLoading ? 0 : 1 }}>
+            <Motion.div 
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {myRecipes.map(recipe => (
-                <motion.div key={recipe.id} variants={itemVariants} className="flex justify-center">
-                  <Link to={`/recipe/${recipe.id}`}>
-                    <RecipeCard 
-                      title={recipe.title}
-                      image={recipe.image}
-                      timeInMins={recipe.timeInMins}
-                      rating={recipe.rating}
-                      servings={recipe.servings}
-                    />
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.div>
+              {myRecipes.length > 0 ? (
+                myRecipes.map(recipe => (
+                  <Motion.div key={recipe.id} variants={itemVariants} className="flex justify-center">
+                    <Link to={`/recipe/${recipe.id}`}>
+                      <RecipeCard 
+                        title={recipe.title}
+                        image={recipe.image}
+                        timeInMins={recipe.timeInMins}
+                        rating={recipe.rating}
+                        servings={recipe.servings}
+                      />
+                    </Link>
+                  </Motion.div>
+                ))
+              ) : (
+                <Motion.div 
+                  className="col-span-3 text-center py-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="flex flex-col items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 className="text-xl font-semibold mb-2" style={{ color: theme.core.text }}>
+                      You haven't added any recipes yet
+                    </h3>
+                    <p className="mb-6" style={{ color: theme.core.text, opacity: 0.7 }}>
+                      Share your favorite recipes with the community!
+                    </p>
+                    <Link 
+                      to="/add-recipe" 
+                      className="px-6 py-3 rounded-md transition-all duration-300 hover:shadow-lg hover:scale-105"
+                      style={{ 
+                        backgroundColor: theme.headerfooter.logoRed, 
+                        color: '#fff'
+                      }}
+                    >
+                      Add Your First Recipe
+                    </Link>
+                  </div>
+                </Motion.div>
+              )}
+            </Motion.div>
           </div>
         )}
 
         {activeTab === 'savedRecipes' && (
-          <div ref={savedRecipesRef} className="opacity-0 transition-opacity duration-1000 px-6">
-            <motion.div 
+          <div ref={savedRecipesRef} className="transition-opacity duration-1000 px-6"
+               style={{ opacity: isLoading ? 0 : 1 }}>
+            <Motion.div 
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {mockSavedRecipes.map(recipe => (
-                <motion.div key={recipe.id} variants={itemVariants} className="flex justify-center">
-                  <Link to={`/recipe/${recipe.id}`}>
-                    <RecipeCard 
-                      title={recipe.title}
-                      image={recipe.image}
-                      timeInMins={recipe.timeInMins}
-                      rating={recipe.rating}
-                      servings={recipe.servings}
-                    />
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.div>
+              {savedRecipes.length > 0 ? (
+                savedRecipes.map(recipe => (
+                  <Motion.div key={recipe.id} variants={itemVariants} className="flex justify-center">
+                    <Link to={`/recipe/${recipe.id}`}>
+                      <RecipeCard 
+                        title={recipe.title}
+                        image={recipe.image}
+                        timeInMins={recipe.timeInMins}
+                        rating={recipe.rating}
+                        servings={recipe.servings}
+                      />
+                    </Link>
+                  </Motion.div>
+                ))
+              ) : (
+                <Motion.div 
+                  className="col-span-3 text-center py-10"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="flex flex-col items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <h3 className="text-xl font-semibold mb-2" style={{ color: theme.core.text }}>
+                      No saved recipes yet
+                    </h3>
+                    <p className="mb-6" style={{ color: theme.core.text, opacity: 0.7 }}>
+                      Explore recipes and save your favorites for later!
+                    </p>
+                    <Link 
+                      to="/" 
+                      className="px-6 py-3 rounded-md transition-all duration-300 hover:shadow-lg hover:scale-105"
+                      style={{ 
+                        backgroundColor: theme.headerfooter.logoRed, 
+                        color: '#fff'
+                      }}
+                    >
+                      Browse Recipes
+                    </Link>
+                  </div>
+                </Motion.div>
+              )}
+            </Motion.div>
           </div>
         )}
 
@@ -401,7 +808,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
               className="rounded-lg shadow-md p-6"
               style={{ backgroundColor: theme.core.container }}
             >
-              <motion.h2 
+              <Motion.h2 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -409,10 +816,10 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                 style={{ color: theme.core.text }}
               >
                 Account Settings
-              </motion.h2>
+              </Motion.h2>
               
               <div className="space-y-6">
-                <motion.div 
+                <Motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1, duration: 0.5 }}
@@ -425,7 +832,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                   >
                     Profile Information
                   </h3>
-                  <form className="space-y-4">
+                  <form onSubmit={handleProfileUpdate} className="space-y-4">
                     <div>
                       <label 
                         className="block mb-2"
@@ -434,14 +841,16 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                         Username
                       </label>
                       <input 
-                        type="text" 
+                        type="text"
+                        name="username"
                         className="w-full px-4 py-2 border rounded-md focus:outline-none"
                         style={{ 
                           backgroundColor: theme.headerfooter.searchBox,
                           borderColor: theme.core.containerHoover,
                           color: theme.core.text
                         }}
-                        defaultValue={userData.username}
+                        value={formData.username}
+                        onChange={handleInputChange}
                       />
                     </div>
                     <div>
@@ -452,6 +861,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                         Bio
                       </label>
                       <textarea 
+                        name="bio"
                         className="w-full px-4 py-2 border rounded-md focus:outline-none"
                         style={{ 
                           backgroundColor: theme.headerfooter.searchBox,
@@ -459,7 +869,54 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                           color: theme.core.text
                         }}
                         rows="3"
-                        defaultValue={userData.bio}
+                        value={formData.bio}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    
+                    <div className="flex justify-end mt-8">
+                      <button 
+                        type="submit"
+                        disabled={isUpdating || !hasProfileChanges()}
+                        className="px-4 py-2 rounded-md focus:outline-none transition-all duration-300 hover:scale-110 hover:shadow-lg cursor-pointer disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+                        style={{ backgroundColor: theme.headerfooter.logoRed, color: '#fff' }}
+                      >
+                        {isUpdating ? 'Saving...' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </form>
+                </Motion.div>
+                
+                <Motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                >
+                  <h3 
+                    className="text-lg font-medium mb-4"
+                    style={{ color: theme.core.text }}
+                  >
+                    Change Password
+                  </h3>
+                  <form onSubmit={handlePasswordUpdate} className="space-y-4">
+                    <div>
+                      <label 
+                        className="block mb-2"
+                        style={{ color: theme.core.text }}
+                      >
+                        Current Password
+                      </label>
+                      <input 
+                        type="password"
+                        name="currentPassword"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-none"
+                        style={{ 
+                          backgroundColor: theme.headerfooter.searchBox,
+                          borderColor: theme.core.containerHoover,
+                          color: theme.core.text
+                        }}
+                        value={formData.currentPassword}
+                        onChange={handleInputChange}
                       />
                     </div>
                     <div>
@@ -467,34 +924,93 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                         className="block mb-2"
                         style={{ color: theme.core.text }}
                       >
-                        Email
+                        New Password
                       </label>
                       <input 
-                        type="email" 
+                        type="password"
+                        name="newPassword"
                         className="w-full px-4 py-2 border rounded-md focus:outline-none"
                         style={{ 
                           backgroundColor: theme.headerfooter.searchBox,
                           borderColor: theme.core.containerHoover,
                           color: theme.core.text
                         }}
-                        defaultValue={userData.email || "user@example.com"}
-                        readOnly={!!userData.email}
+                        value={formData.newPassword}
+                        onChange={handleInputChange}
+                      />
+                      <div className="mt-2 text-sm" style={{ color: theme.core.text }}>
+                        <p>Password requirements:</p>
+                        <ul className="list-disc pl-5 mt-1">
+                          <li style={{ 
+                            color: passwordValidation.length ? '#10B981' : '#EF4444',
+                            transition: 'color 0.3s ease'
+                          }}>
+                            At least 8 characters
+                            {passwordValidation.length && <span className="ml-1">✓</span>}
+                          </li>
+                          <li style={{ 
+                            color: passwordValidation.number ? '#10B981' : '#EF4444',
+                            transition: 'color 0.3s ease'
+                          }}>
+                            At least one number
+                            {passwordValidation.number && <span className="ml-1">✓</span>}
+                          </li>
+                          <li style={{ 
+                            color: passwordValidation.uppercase ? '#10B981' : '#EF4444',
+                            transition: 'color 0.3s ease'
+                          }}>
+                            At least one uppercase letter
+                            {passwordValidation.uppercase && <span className="ml-1">✓</span>}
+                          </li>
+                          <li style={{ 
+                            color: passwordValidation.different ? '#10B981' : '#EF4444',
+                            transition: 'color 0.3s ease'
+                          }}>
+                            Cannot be the same as your current password
+                            {passwordValidation.different && <span className="ml-1">✓</span>}
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div>
+                      <label 
+                        className="block mb-2"
+                        style={{ color: theme.core.text }}
+                      >
+                        Confirm New Password
+                      </label>
+                      <input 
+                        type="password"
+                        name="confirmPassword"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-none"
+                        style={{ 
+                          backgroundColor: theme.headerfooter.searchBox,
+                          borderColor: theme.core.containerHoover,
+                          color: theme.core.text
+                        }}
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
                       />
                     </div>
-                    
-                    <div className="flex justify-end mt-8">
+                    <div className="flex justify-end">
                       <button 
-                        type="button"
-                        className="px-4 py-2 rounded-md focus:outline-none transition-all duration-300 hover:scale-110 hover:shadow-lg cursor-pointer"
+                        type="submit"
+                        disabled={isUpdating || !hasPasswordChanges() || 
+                                 !passwordValidation.length || 
+                                 !passwordValidation.number || 
+                                 !passwordValidation.uppercase || 
+                                 !passwordValidation.different ||
+                                 formData.newPassword !== formData.confirmPassword}
+                        className="px-4 py-2 rounded-md focus:outline-none transition-all duration-300 hover:scale-110 hover:shadow-lg cursor-pointer disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
                         style={{ backgroundColor: theme.headerfooter.logoRed, color: '#fff' }}
                       >
-                        Save Changes
+                        {isUpdating ? 'Updating...' : 'Update Password'}
                       </button>
                     </div>
                   </form>
-                </motion.div>
+                </Motion.div>
                 
-                <motion.div
+                <Motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
@@ -507,16 +1023,27 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                   </h3>
                   <div className="space-y-4">
                     <button 
+                      onClick={async () => {
+                        try {
+                          await addSampleRecipes(token);
+                          showNotification('success', 'Sample recipes added successfully!');
+                        } catch (err) {
+                          console.error('Error adding sample recipes:', err);
+                          showNotification('error', 'Failed to add sample recipes');
+                        }
+                      }}
                       className="flex items-center transition-all duration-300 hover:translate-x-2 hover:font-medium p-2 rounded-md hover:bg-opacity-10 hover:bg-white"
                       style={{ color: theme.headerfooter.logoRed }}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 mr-2">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
-                      Change Password
+                      Add Sample Recipes
                     </button>
                     <button 
-                      className="flex items-center transition-all duration-300 hover:translate-x-2 hover:font-medium p-2 rounded-md hover:bg-opacity-10 hover:bg-white"
+                      onClick={handleDeleteAccount}
+                      disabled={isUpdating}
+                      className="flex items-center transition-all duration-300 hover:translate-x-2 hover:font-medium p-2 rounded-md hover:bg-opacity-10 hover:bg-white disabled:opacity-50"
                       style={{ color: theme.headerfooter.logoRed }}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 mr-2">
@@ -535,7 +1062,7 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
                       Logout
                     </button>
                   </div>
-                </motion.div>
+                </Motion.div>
               </div>
             </div>
           </div>
@@ -543,7 +1070,8 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
       </div>
 
       {/* Add custom CSS for animations */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .animate-fade-in {
           animation: fadeIn 1s forwards;
         }
@@ -557,7 +1085,18 @@ const ProfilePage = ({ initialTab = 'myRecipes' }) => {
           background-image: radial-gradient(currentColor 1px, transparent 1px);
           background-size: 40px 40px;
         }
-      `}</style>
+        
+        @keyframes slideIn {
+          from {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}} />
     </div>
   );
 };

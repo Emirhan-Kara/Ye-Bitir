@@ -1,7 +1,30 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
+import { createRecipe } from '../services/ApiService';
+import { useNotification } from '../context/NotificationContext';
+
+// Define unitOptions outside the component
+const unitOptions = [
+  {
+    category: "Volume",
+    units: ["cup", "tablespoon", "teaspoon", "ml", "l", "fluid oz", "gallon", "quart", "pint"]
+  },
+  {
+    category: "Weight",
+    units: ["gram", "kg", "oz", "lb", "pound"]
+  },
+  {
+    category: "Count/Pieces",
+    units: ["piece", "whole", "clove", "slice", "can"]
+  },
+  {
+    category: "Special",
+    units: ["pinch", "dash", "to taste", "as needed"]
+  }
+];
 
 // Memoized AnimatedFoodIconsBackground component to prevent re-renders
 const AnimatedFoodIconsBackground = React.memo(({ count }) => {
@@ -17,6 +40,15 @@ const AddRecipePage = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const { theme } = useTheme();
+  const { isLoggedIn, token } = useAuth();
+  const { dispatch } = useNotification();
+
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
   // Recipe form state
   const [recipe, setRecipe] = useState({
@@ -39,39 +71,108 @@ const AddRecipePage = () => {
   const [currentIngredient, setCurrentIngredient] = useState({
     name: '',
     quantity: '',
-    unit: 'cup'
+    unit: unitOptions[0].units[0],
+    customUnit: ''
   });
   
   const [currentStepText, setCurrentStepText] = useState('');
 
   // Options for dropdown selects
   const cuisineOptions = [
-    'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 
-    'French', 'Mediterranean', 'American', 'Thai', 'Greek', 'Other'
+    'Turkish', 'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 
+    'French', 'Mediterranean', 'American', 'Thai', 'Greek', 'Korean',
+    'Middle Eastern', 'Spanish', 'Vietnamese', 'Brazilian', 'Other'
   ];
   
   const mealTypeOptions = [
-    'Breakfast', 'Lunch', 'Dinner', 'Appetizer', 'Soup', 
-    'Salad', 'Main Course', 'Side Dish', 'Dessert', 'Snack', 'Drink'
+    'Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Appetizer', 'Soup', 
+    'Salad', 'Main Course', 'Side Dish', 'Dessert', 'Snack', 'Beverage'
   ];
   
   const dietOptions = [
-    'Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 
-    'Low-Carb', 'Keto', 'Paleo', 'Whole30', 'None'
+    'Regular', 'Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 
+    'Low-Carb', 'Keto', 'Paleo', 'Halal', 'Kosher', 'None'
   ];
 
   const mainIngredientOptions = [
-    'Chicken', 'Beef', 'Pork', 'Fish', 'Seafood', 'Tofu', 
-    'Beans', 'Vegetables', 'Pasta', 'Rice', 'Other'
+    'Beef', 'Chicken', 'Pork', 'Lamb', 'Fish', 'Seafood',
+    'Eggs', 'Tofu', 'Beans', 'Lentils',
+    'Rice', 'Pasta', 'Bread', 'Potatoes',
+    'Vegetables', 'Mushrooms', 'Fruits',
+    'Other'
   ];
 
-  const unitOptions = [
-    'cup', 'tablespoon', 'tbsp', 'teaspoon', 'tsp', 'fluid ounce', 'fl oz', 
-    'pint', 'pt', 'quart', 'qt', 'gallon', 'gal', 'ml', 'milliliter', 'liter', 'l',
-    'pound', 'lb', 'ounce', 'oz', 'gram', 'g', 'kilogram', 'kg',
-    'pinch', 'dash', 'to taste', 'slice', 'piece', 'whole', 'clove', 'sprig',
-    'handful', 'bunch', 'can', 'package', 'pkg', 'jar', 'none'
-  ];
+  // Add validation states for each step
+  const [stepValidation, setStepValidation] = useState({
+    step1: false,
+    step2: false,
+    step3: false,
+    step4: false
+  });
+
+  // Validate step 1 (Basic Info)
+  const validateStep1 = () => {
+    const requiredFields = {
+      title: 'Recipe Title',
+      cuisine: 'Cuisine',
+      mealType: 'Meal Type',
+      mainIngredient: 'Main Ingredient',
+      prepTime: 'Preparation Time',
+      cookTime: 'Cooking Time',
+      servings: 'Servings'
+    };
+
+    const missingFields = [];
+    for (const [field, label] of Object.entries(requiredFields)) {
+      if (!recipe[field] || recipe[field].toString().trim() === '') {
+        missingFields.push(label);
+      }
+    }
+
+    // Additional numeric validations
+    if (recipe.prepTime && (isNaN(recipe.prepTime) || parseInt(recipe.prepTime) < 0)) {
+      missingFields.push('Valid Preparation Time');
+    }
+    if (recipe.cookTime && (isNaN(recipe.cookTime) || parseInt(recipe.cookTime) < 0)) {
+      missingFields.push('Valid Cooking Time');
+    }
+    if (recipe.servings && (isNaN(recipe.servings) || parseInt(recipe.servings) < 1)) {
+      missingFields.push('Valid number of Servings');
+    }
+
+    const isValid = missingFields.length === 0;
+    setStepValidation(prev => ({ ...prev, step1: isValid }));
+    return isValid;
+  };
+
+  // Validate step 2 (Ingredients)
+  const validateStep2 = () => {
+    const isValid = recipe.ingredients.length > 0;
+    setStepValidation(prev => ({ ...prev, step2: isValid }));
+    return isValid;
+  };
+
+  // Validate step 3 (Instructions)
+  const validateStep3 = () => {
+    const isValid = recipe.steps.length > 0;
+    setStepValidation(prev => ({ ...prev, step3: isValid }));
+    return isValid;
+  };
+
+  // Validate step 4 (Photo)
+  const validateStep4 = () => {
+    const isValid = true; // Photo is optional
+    setStepValidation(prev => ({ ...prev, step4: isValid }));
+    return isValid;
+  };
+
+  // Update validation when recipe data changes
+  React.useEffect(() => {
+    validateStep1();
+    validateStep2();
+    validateStep3();
+    validateStep4();
+  }, [recipe]);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -84,10 +185,31 @@ const AddRecipePage = () => {
 
   // Handle photo upload
   const handlePhotoChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        dispatch({
+          type: "error",
+          message: "Please select an image file",
+          duration: 3000
+        });
+        return;
+      }
+
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        dispatch({
+          type: "error",
+          message: "Image size should not exceed 5MB",
+          duration: 3000
+        });
+        return;
+      }
+
+      // Create preview URL
       const filePreview = URL.createObjectURL(file);
-      
+
       setRecipe(prev => ({
         ...prev,
         photo: file,
@@ -105,19 +227,136 @@ const AddRecipePage = () => {
     }));
   };
 
-  // Add ingredient to list
-  const addIngredient = () => {
-    if (currentIngredient.name.trim() && currentIngredient.quantity) {
-      setRecipe(prev => ({
-        ...prev,
-        ingredients: [...prev.ingredients, { ...currentIngredient, id: Date.now() }]
-      }));
-      setCurrentIngredient({
-        name: '',
-        quantity: '',
-        unit: 'cup'
+  // Handle next step with validation
+  const nextStep = () => {
+    let canProceed = false;
+    
+    switch (currentStep) {
+      case 1:
+        canProceed = validateStep1();
+        break;
+      case 2:
+        canProceed = validateStep2();
+        break;
+      case 3:
+        canProceed = validateStep3();
+        break;
+      case 4:
+        canProceed = validateStep4();
+        break;
+      default:
+        canProceed = false;
+    }
+
+    if (canProceed && currentStep < 5) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  // Previous step function
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Check if next button should be enabled
+  const isNextEnabled = () => {
+    switch (currentStep) {
+      case 1:
+        return stepValidation.step1;
+      case 2:
+        return stepValidation.step2;
+      case 3:
+        return stepValidation.step3;
+      case 4:
+        return stepValidation.step4;
+      default:
+        return false;
+    }
+  };
+
+  // Handle cancel/quit recipe creation
+  const handleCancel = () => {
+    if (recipe.title || recipe.ingredients.length > 0 || recipe.steps.length > 0) {
+      if (window.confirm('Are you sure you want to quit? Your recipe progress will be lost.')) {
+        navigate('/profile');
+      }
+    } else {
+      navigate('/profile');
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const prepTimeInt = parseInt(recipe.prepTime) || 0;
+      const cookTimeInt = parseInt(recipe.cookTime) || 0;
+      
+      const newRecipe = {
+        title: recipe.title,
+        description: recipe.description || '',
+        timeInMins: prepTimeInt + cookTimeInt,
+        servings: parseInt(recipe.servings) || 1,
+        cuisine: recipe.cuisine,
+        mealType: recipe.mealType,
+        diet: recipe.diet || '',
+        mainIngredient: recipe.mainIngredient || '',
+        prepTime: prepTimeInt,
+        cookTime: cookTimeInt,
+        ingredients: recipe.ingredients.map(ing => `${ing.quantity} ${ing.unit} ${ing.name}`),
+        instructions: recipe.steps.map(step => step.text)
+      };
+      
+      // Send the recipe to the backend with image and token
+      await createRecipe(newRecipe, recipe.photo, token);
+      
+      // Show success notification
+      dispatch({
+        type: "success",
+        message: "Recipe created successfully!",
+        duration: 3000
+      });
+      
+      navigate('/profile');
+    } catch (error) {
+      console.error('Error creating recipe:', error);
+      dispatch({
+        type: "error",
+        message: error.message || 'Failed to create recipe. Please try again.',
+        duration: 5000
       });
     }
+  };
+
+  // Add ingredient to list
+  const addIngredient = () => {
+    if (!currentIngredient.name || !currentIngredient.quantity) {
+      return;
+    }
+
+    const finalUnit = currentIngredient.unit === 'custom' ? currentIngredient.customUnit : currentIngredient.unit;
+    
+    setRecipe(prev => ({
+      ...prev,
+      ingredients: [
+        ...prev.ingredients,
+        {
+          name: currentIngredient.name,
+          quantity: currentIngredient.quantity,
+          unit: finalUnit,
+          id: Date.now()
+        }
+      ]
+    }));
+
+    setCurrentIngredient({
+      name: "",
+      quantity: "",
+      unit: unitOptions[0].units[0],
+      customUnit: ""
+    });
   };
 
   // Remove ingredient from list
@@ -145,93 +384,6 @@ const AddRecipePage = () => {
       ...prev,
       steps: prev.steps.filter(step => step.id !== id)
     }));
-  };
-
-  // Simple navigation functions
-  const nextStep = () => {
-    if (currentStep < 5) { // Now we have 5 steps including review
-      setCurrentStep(currentStep + 1);
-    }
-  };
-  
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  // Handle cancel/quit recipe creation
-  const handleCancel = () => {
-    if (recipe.title || recipe.ingredients.length > 0 || recipe.steps.length > 0) {
-      if (window.confirm('Are you sure you want to quit? Your recipe progress will be lost.')) {
-        navigate('/profile');
-      }
-    } else {
-      navigate('/profile');
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Validate required fields
-    if (!recipe.title) {
-      alert('Please enter a recipe title.');
-      setCurrentStep(1);
-      return;
-    }
-    
-    if (!recipe.cuisine) {
-      alert('Please select a cuisine.');
-      setCurrentStep(1);
-      return;
-    }
-    
-    if (!recipe.mealType) {
-      alert('Please select a meal type.');
-      setCurrentStep(1);
-      return;
-    }
-    
-    if (recipe.ingredients.length === 0) {
-      alert('Please add at least one ingredient.');
-      setCurrentStep(2);
-      return;
-    }
-    
-    if (recipe.steps.length === 0) {
-      alert('Please add at least one instruction step.');
-      setCurrentStep(3);
-      return;
-    }
-    
-    // Create a new recipe object to add to profile
-    const newRecipe = {
-      id: Date.now(),
-      title: recipe.title,
-      image: recipe.photoPreview || "/api/placeholder/320/240",
-      timeInMins: parseInt(recipe.prepTime) + parseInt(recipe.cookTime) || 30,
-      rating: 0,
-      servings: recipe.servings,
-      fullRecipe: {
-        ...recipe,
-        dateCreated: new Date().toISOString()
-      }
-    };
-    
-    console.log('Recipe to submit:', newRecipe);
-    
-    try {
-      const existingRecipes = JSON.parse(localStorage.getItem('myRecipes')) || [];
-      const updatedRecipes = [newRecipe, ...existingRecipes];
-      localStorage.setItem('myRecipes', JSON.stringify(updatedRecipes));
-      alert('Recipe added to your profile successfully!');
-      navigate('/profile');
-    } catch (error) {
-      console.error('Error saving recipe:', error);
-      alert('There was an error saving your recipe. Please try again.');
-    }
   };
 
   return (
@@ -413,36 +565,55 @@ const AddRecipePage = () => {
                     name="name"
                     value={currentIngredient.name}
                     onChange={handleIngredientChange}
-                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     placeholder="e.g. Flour"
                   />
                 </div>
                 
                 <div className="md:w-1/4">
-                  <label className="block  mb-2">Quantity</label>
+                  <label className="block mb-2">Quantity</label>
                   <input
                     type="text"
                     name="quantity"
                     value={currentIngredient.quantity}
                     onChange={handleIngredientChange}
-                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                     placeholder="e.g. 2"
                   />
                 </div>
                 
                 <div className="md:w-1/4">
-                  <label className="block  mb-2">Unit</label>
+                  <label className="block mb-2">Unit Type</label>
                   <select
                     name="unit"
                     value={currentIngredient.unit}
                     onChange={handleIngredientChange}
-                    className="w-full px-4 py-2 border  rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
                   >
-                    {unitOptions.map(unit => (
-                      <option style={{ color: theme.headerfooter.logoRed}} key={unit} value={unit}>{unit}</option>
+                    {unitOptions.map(category => (
+                      <optgroup key={category.category} label={category.category}>
+                        {category.units.map(unit => (
+                          <option key={unit} value={unit}>{unit}</option>
+                        ))}
+                      </optgroup>
                     ))}
+                    <option value="custom">Custom Unit</option>
                   </select>
                 </div>
+
+                {currentIngredient.unit === 'custom' && (
+                  <div className="md:w-1/4">
+                    <label className="block mb-2">Custom Unit</label>
+                    <input
+                      type="text"
+                      name="customUnit"
+                      value={currentIngredient.customUnit}
+                      onChange={handleIngredientChange}
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#c0392b]"
+                      placeholder="e.g. slice"
+                    />
+                  </div>
+                )}
                 
                 <div className="md:w-auto flex items-end">
                   <button
@@ -519,7 +690,7 @@ const AddRecipePage = () => {
                   <ol className="space-y-4">
                     {recipe.steps.map((step, index) => (
                       <li key={step.id} className="flex items-start bg-[#e2ece0] p-4 rounded-md"
-                                        style={{ backgroundColor: theme.core.containerHoover }}>
+                                      style={{ backgroundColor: theme.core.containerHoover }}>
                         <span className="w-6 h-6 rounded-full flex items-center justify-center mr-4 flex-shrink-0 mt-1"
                               style={{ backgroundColor: theme.core.container, color: theme.core.text}}>
                           {index + 1}
@@ -661,7 +832,7 @@ const AddRecipePage = () => {
                   <h4 className="text-lg font-semibold  mb-3">Instructions</h4>
                   {recipe.steps.length > 0 ? (
                     <ol className="list-decimal pl-5 space-y-2">
-                      {recipe.steps.map((step, index) => (
+                      {recipe.steps.map((step) => (
                         <li key={step.id} className="mb-2">
                           {step.text}
                         </li>
@@ -676,12 +847,12 @@ const AddRecipePage = () => {
           )}
           
           {/* Navigation Buttons */}
-          <div className="mt-8 flex justify-between">
+          <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4 sm:gap-0">
             {currentStep > 1 && (
               <button
                 type="button"
                 onClick={prevStep}
-                className="border hover:brightness-80 px-6 py-2 rounded-md focus:outline-none transition-colors cursor-pointer hover:scale-110"
+                className="w-full sm:w-auto border hover:brightness-80 px-6 py-2 rounded-md focus:outline-none transition-colors cursor-pointer hover:scale-110"
                 style={{ color: theme.core.text,  backgroundColor: theme.headerfooter.background}}
               >
                 Previous
@@ -691,8 +862,8 @@ const AddRecipePage = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="border hover:brightness-80 px-6 py-2 rounded-md focus:outline-none transition-colors cursor-pointer hover:scale-110"
-                style={{ color: theme.core.text,  backgroundColor: theme.headerfooter.background}}
+              className="w-full sm:w-auto border hover:brightness-80 px-6 py-2 rounded-md focus:outline-none transition-colors cursor-pointer hover:scale-110"
+              style={{ color: theme.core.text,  backgroundColor: theme.headerfooter.background}}
             >
               Cancel
             </button>
@@ -701,7 +872,12 @@ const AddRecipePage = () => {
               <button
                 type="button"
                 onClick={nextStep}
-                className="bg-[#c0392b] hover:bg-[#a82315] border-2 hover:scale-110 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                disabled={!isNextEnabled()}
+                className={`w-full sm:w-auto bg-[#c0392b] border-2 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors ${
+                  isNextEnabled() 
+                    ? 'hover:bg-[#a82315] hover:scale-110' 
+                    : 'opacity-50 cursor-not-allowed'
+                }`}
                 style={{ borderColor: theme.core.text }}
               >
                 Next
@@ -710,7 +886,7 @@ const AddRecipePage = () => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="border-2 bg-[#c0392b] hover:bg-[#a82315] hover:scale-110 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
+                className="w-full sm:w-auto border-2 bg-[#c0392b] hover:bg-[#a82315] hover:scale-110 cursor-pointer text-white px-6 py-2 rounded-md focus:outline-none transition-colors"
                 style={{ borderColor: theme.core.text }}
               >
                 Submit Recipe

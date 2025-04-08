@@ -198,6 +198,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
   const { theme } = useTheme();
@@ -237,30 +238,35 @@ const Login = () => {
     };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    
     // Basic validation
     if (!email || !password) {
       setError('Please fill in all fields');
+      setIsLoading(false);
       return;
     }
     
-    // Attempt login with our auth context
-    const result = login(email, password);
-    
-    if (result.success) {
-      // Check if the user is an admin based on email
-      if (email.toLowerCase() === 'admin@gmail.com') {
-        // Navigate to admin dashboard for admin users
-        navigate('/admin');
+    try {
+      // Attempt login with our auth context
+      const result = await login(email, password);
+      
+      if (result.success) {
+        // Get the saved redirect path or default to home
+        const redirectPath = localStorage.getItem('redirectPath') || '/';
+        localStorage.removeItem('redirectPath'); // Clear the saved path
+        navigate(redirectPath);
+      } else {
+        setError(result.message || 'Login failed. Please try again.');
       }
-      else
-      {
-        localStorage.removeItem('redirectPath'); // Clear it
-        navigate('/');
-      }
-    } else {
-      setError(result.message || 'Invalid email or password');
+    } catch (err) {
+      setError('An error occurred during login. Please try again.');
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -373,7 +379,7 @@ const Login = () => {
         <ThemeToggle />
       </div>
 
-      <div className="relative z-10 min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="relative z-10 min-h-screen flex flex-col justify-center py-8 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           {/* Logo/Brand */}
           <div className="flex justify-center animate-float">
@@ -395,19 +401,9 @@ const Login = () => {
           <h2 className="mt-6 text-center text-3xl font-extrabold relative z-10 animate-fadeIn">
             <span className="relative edgy-title">Log in</span>
           </h2>
-          <div className="mt-3 text-center text-sm animate-fadeIn delay-200">
-            <p className="font-medium">
-              Demo Credentials:
-            </p>
-            <p className="mt-1">
-              Admin: admin@gmail.com / Test1234
-              <br />
-              User: user@gmail.com / Test1234
-            </p>
-          </div>
         </div>
 
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-fadeIn delay-300">
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-fadeIn delay-200">
           <div 
             className="login-card sm:rounded-lg sm:px-10 edgy-form-container" 
             style={{ 
@@ -420,7 +416,7 @@ const Login = () => {
               </div>
             )}
             
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium">
                   Email address
@@ -487,13 +483,25 @@ const Login = () => {
               <div>
                 <button
                   type="submit"
-                  className="login-btn edgy-button cursor-pointer"
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   style={{ 
-                    backgroundColor: theme.headerfooter.logoRed
+                    backgroundColor: theme.headerfooter.logoRed,
+                    opacity: isLoading ? 0.7 : 1,
+                    cursor: isLoading ? 'not-allowed' : 'pointer'
                   }}
+                  disabled={isLoading}
                 >
-                  <LogIn size={18} />
-                  <span>Log in</span>
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Logging in...
+                    </>
+                  ) : (
+                    'Log in'
+                  )}
                 </button>
               </div>
             </form>

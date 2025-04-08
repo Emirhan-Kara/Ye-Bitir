@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
-import { motion } from 'framer-motion';
 import './SearchPage.css';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
+import { searchRecipes } from '../services/ApiService';
 
 // Memoized AnimatedFoodIconsBackground component to prevent re-renders
 const AnimatedFoodIconsBackground = React.memo(({ count }) => {
@@ -18,10 +18,12 @@ const AnimatedFoodIconsBackground = React.memo(({ count }) => {
 
 const SearchPage = () => {
   const { theme } = useTheme();
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
   
   // State for recipes
   const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   // State for filters
   const [filters, setFilters] = useState({
     query: '',
@@ -33,10 +35,6 @@ const SearchPage = () => {
     mainIngredient: '',
     servings: ''
   });
-  // State for sorting
-  const [sortOption, setSortOption] = useState('rating-desc');
-  // State for mobile filter visibility
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   
   // Options for dropdowns (copied from AddRecipePage.jsx)
   const cuisineOptions = [
@@ -59,16 +57,6 @@ const SearchPage = () => {
     'Beans', 'Vegetables', 'Pasta', 'Rice', 'Other'
   ];
   
-  // Sorting options
-  const sortOptions = [
-    { value: 'rating-desc', label: 'Highest Rated' },
-    { value: 'rating-asc', label: 'Lowest Rated' },
-    { value: 'time-asc', label: 'Shortest Cooking Time' },
-    { value: 'time-desc', label: 'Longest Cooking Time' },
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' }
-  ];
-  
   // Handle filter changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -78,176 +66,36 @@ const SearchPage = () => {
     }));
   };
   
-  // Handle sorting change
-  const handleSortChange = (e) => {
-    setSortOption(e.target.value);
-  };
-  
-  // Toggle mobile filters
-  const toggleMobileFilters = () => {
-    setShowMobileFilters(!showMobileFilters);
-  };
-
   // Handle recipe card click to navigate to recipe details
   const handleRecipeClick = (recipeId) => {
-    // Navigate to the recipe detail page
     navigate(`/recipe/${recipeId}`);
-    // Scroll to top for better user experience
     window.scrollTo(0, 0);
   };
   
-  // Load recipes (for demo, we'll generate some mock data)
+  // Fetch recipes from backend
   useEffect(() => {
-    // In a real app, you'd fetch from an API
-    // For now, we'll check if there are recipes in localStorage
-    // (since AddRecipePage saves recipes there)
-    const savedRecipes = JSON.parse(localStorage.getItem('myRecipes')) || [];
-    
-    // If no saved recipes, generate mock data
-    if (savedRecipes.length === 0) {
-      const mockRecipes = generateMockRecipes(24);
-      setRecipes(mockRecipes);
-    } else {
-      setRecipes(savedRecipes);
-    }
-  }, []);
-  
-  // Filter and sort recipes
-  const filteredAndSortedRecipes = () => {
-    // First apply filters
-    let result = recipes.filter(recipe => {
-      // Text search
-      if (filters.query && !recipe.title.toLowerCase().includes(filters.query.toLowerCase())) {
-        return false;
-      }
+    const fetchRecipes = async () => {
+      setLoading(true);
+      setError(null);
       
-      // Rating filter
-      if (recipe.rating < filters.minRating) {
-        return false;
+      try {
+        const searchParams = {
+          ...filters
+        };
+        
+        const data = await searchRecipes(searchParams);
+        setRecipes(data);
+      } catch (err) {
+        console.error('Error fetching recipes:', err);
+        setError('Failed to load recipes. Please try again later.');
+      } finally {
+        setLoading(false);
       }
-      
-      // Cooking time filter
-      if (filters.maxCookingTime < recipe.timeInMins) {
-        return false;
-      }
-      
-      // Cuisine filter
-      if (filters.cuisine && recipe.fullRecipe && recipe.fullRecipe.cuisine !== filters.cuisine) {
-        return false;
-      }
-      
-      // Meal type filter
-      if (filters.mealType && recipe.fullRecipe && recipe.fullRecipe.mealType !== filters.mealType) {
-        return false;
-      }
-      
-      // Diet filter
-      if (filters.diet && recipe.fullRecipe && recipe.fullRecipe.diet !== filters.diet) {
-        return false;
-      }
-      
-      // Main ingredient filter
-      if (filters.mainIngredient && recipe.fullRecipe && recipe.fullRecipe.mainIngredient !== filters.mainIngredient) {
-        return false;
-      }
-      
-      // Servings filter
-      if (filters.servings && recipe.servings !== parseInt(filters.servings)) {
-        return false;
-      }
-      
-      return true;
-    });
-    
-    // Then apply sorting
-    result.sort((a, b) => {
-      switch (sortOption) {
-        case 'rating-desc':
-          return b.rating - a.rating;
-        case 'rating-asc':
-          return a.rating - b.rating;
-        case 'time-asc':
-          return a.timeInMins - b.timeInMins;
-        case 'time-desc':
-          return b.timeInMins - a.timeInMins;
-        case 'newest':
-          return new Date(b.fullRecipe?.dateCreated || 0) - new Date(a.fullRecipe?.dateCreated || 0);
-        case 'oldest':
-          return new Date(a.fullRecipe?.dateCreated || 0) - new Date(b.fullRecipe?.dateCreated || 0);
-        default:
-          return 0;
-      }
-    });
-    
-    return result;
-  };
-  
-  // Helper to generate mock recipes with more interesting titles
-  const generateMockRecipes = (count) => {
-    const recipeTitles = [
-      "Spicy Turkish Kebabs", "Mediterranean Pasta Salad", "Creamy Mushroom Risotto", 
-      "Classic Beef Bourguignon", "Vegetarian Stuffed Peppers", "Thai Red Curry",
-      "Homemade Margherita Pizza", "Japanese Miso Ramen", "Greek Moussaka",
-      "Vegan Chocolate Cake", "Lemon Garlic Roast Chicken", "Indian Butter Chicken",
-      "Crispy Fish Tacos", "Authentic Pad Thai", "French Onion Soup",
-      "Fresh Spring Rolls", "Mexican Street Corn", "Spinach and Feta Quiche",
-      "Hearty Beef Stew", "Garlic Butter Shrimp Pasta", "Turkish Baklava",
-      "Homemade Falafel Bowl", "Quinoa Buddha Bowl", "Classic Cheese Burger"
-    ];
-    
-    const images = [
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8l9oRLw7lTlYD_XG3ddN83hOsJz8vxMazjQ&s",
-      "https://veganwithgusto.com/wp-content/uploads/2021/05/vegan-Thai-curry-in-bowl-with-fork-and-spoon.jpg",
-      "https://ohsweetbasil.com/wp-content/uploads/how-to-make-authentic-margherita-pizza-at-home-recipe-6-327x491.jpg",
-      "https://www.seriouseats.com/thmb/NL2ZMEcQs_51g1Lk06C0Hlf_xqA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__images__2016__06__20160702-salmon-rice-bowl3-30cfd40dfc5941d8b992f5fbb543031c.jpg",
-      "https://cdn.loveandlemons.com/wp-content/uploads/2023/08/vegetarian-stuffed-peppers.jpg",
-      "https://www.sweetteaandthyme.com/wp-content/uploads/2023/11/truffle-mushroom-risotto-overhead-close.jpg",
-      "https://fedbysab.com/wp-content/uploads/2021/11/Mexican-Street-Corn-Chicken-Tacos-1.jpg",
-      "https://www.wellseasonedstudio.com/wp-content/uploads/2023/06/Honey-garlic-salmon-fillet-on-bed-of-white-rice-and-side-of-bokchoy-on-plate-with-fork.jpg",
-      "https://cdn.loveandlemons.com/wp-content/uploads/2020/06/IMG_25456.jpg",
-    ];
-    return Array.from({ length: count }, (_, i) => ({
-      id: i + 1,
-      title: recipeTitles[i % recipeTitles.length],
-      image: images[i % images.length],
-      timeInMins: Math.floor(Math.random() * 120) + 10,
-      rating: (Math.random() * 5).toFixed(1),
-      servings: Math.floor(Math.random() * 6) + 1,
-      fullRecipe: {
-        cuisine: cuisineOptions[Math.floor(Math.random() * cuisineOptions.length)],
-        mealType: mealTypeOptions[Math.floor(Math.random() * mealTypeOptions.length)],
-        diet: dietOptions[Math.floor(Math.random() * dietOptions.length)],
-        mainIngredient: mainIngredientOptions[Math.floor(Math.random() * mainIngredientOptions.length)],
-        dateCreated: new Date(Date.now() - Math.random() * 10000000000).toISOString()
-      }
-    }));
-  };
-  
-  // Get the filtered and sorted recipes
-  const displayRecipes = filteredAndSortedRecipes();
-  
-  // Animation variants for recipe cards
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-  
-  const cardVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5
-      }
-    }
-  };
+    };
 
+    fetchRecipes();
+  }, [filters]);
+  
   // Render filter section
   const renderFilters = () => (
     <div 
@@ -449,180 +297,59 @@ const SearchPage = () => {
   );
 
   return (
-    <div className="overflow-hidden" style={{ backgroundColor: theme.core.containerHoover, color: theme.core.text }}>
-      {/* Hero Section */}
-      <div 
-        className="hero-section"
-        style={{ backgroundColor: theme.core.container }}
-      >
-        <div className="hero-background">
-          <div className="hero-pattern bg-pattern"></div>
-          <AnimatedFoodIconsBackground count={45} />
-        </div>
-
-        <motion.div 
-          className="hero-content container mx-auto px-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+    <div className="min-h-screen relative" style={{ backgroundColor: theme.core.background, color: theme.core.text }}>
+      {/* Background with animated food icons */}
+      <AnimatedFoodIconsBackground count={60} />
+      
+      <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+        {/* Search Header */}
+        <div 
+          className="text-center mb-8"
         >
-          <motion.h1 
-            className="hero-title"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            Discover <span className="text-gradient" style={{ backgroundImage: `linear-gradient(15deg, ${theme.headerfooter.logoRed || "#c0392b"}, ${theme.core.text})` }}>Recipes</span>
-          </motion.h1>
-          <motion.p 
-            className="hero-subtitle"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-          >
-            Find the perfect recipe for any occasion, cuisine, or dietary preference
-          </motion.p>
-        </motion.div>
-      </div>
-
-      {/* Curved section divider */}
-      <div className="curve-divider">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path 
-            fill={theme.core.container} 
-            fillOpacity="1" 
-            d="M0,32L40,48C80,64,160,96,240,101.3C320,107,400,85,480,80C560,75,640,85,720,96C800,107,880,117,960,106.7C1040,96,1120,64,1200,53.3C1280,43,1360,53,1400,58.7L1440,64L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z"></path>
-        </svg>
-      </div>
-
-      {/* Main Content Section */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Mobile Filter Toggle Button (visible only on small screens) */}
-        <div className="md:hidden mb-4">
-          <button
-            onClick={toggleMobileFilters}
-            className="mobile-filter-toggle"
-            style={{ 
-              backgroundColor: theme.core.container, 
-              color: theme.core.text,
-              borderColor: theme.core.text
-            }}
-          >
-            <span className="mr-2">
-              {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
-            </span>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="16" 
-              height="16" 
-              fill="currentColor" 
-              viewBox="0 0 16 16"
-              className={`toggle-icon ${showMobileFilters ? 'toggle-icon-open' : ''}`}
-            >
-              <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-            </svg>
-          </button>
+          <h1 className="text-4xl font-bold mb-4">Search Recipes</h1>
+          <p className="text-lg opacity-80">Find your perfect recipe with our advanced search filters</p>
         </div>
-        
-        {/* Mobile Filters (visible when toggled) */}
-        <div className={`md:hidden mb-6 ${showMobileFilters ? 'block' : 'hidden'}`}>
+
+        {/* Filters Section */}
+        <div 
+          className="mb-8"
+        >
           {renderFilters()}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Desktop Filter Sidebar (always visible on larger screens) */}
-          <div className="hidden md:block md:w-1/4">
-            {renderFilters()}
-          </div>
-          
-          {/* Main Content Area */}
-          <div className="md:w-3/4">
-            {/* Header with sort options */}
-            <div 
-              className="recipe-header"
-              style={{ backgroundColor: theme.core.container, color: theme.core.text }}
-            >
-              <div className="flex items-center mb-4 md:mb-0">
-                <h2 className="text-2xl font-bold">Browse Recipes</h2>
-                <span className="recipe-count-badge" style={{ backgroundColor: theme.core.containerHoover }}>
-                  {displayRecipes.length} results
-                </span>
-              </div>
-              <div className="sort-container">
-                <label className="sort-label">Sort by:</label>
-                <select
-                  value={sortOption}
-                  onChange={handleSortChange}
-                  className="sort-select"
-                  style={{ 
-                    borderColor: theme.core.text,
-                    backgroundColor: theme.headerfooter.searchBox || 'rgba(255,255,255,0.1)'
-                  }}
-                >
-                  {sortOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        {/* Results Section */}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {loading ? (
+            <div className="col-span-full flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: theme.headerfooter.logoRed }}></div>
             </div>
-            
-            {/* Recipe Grid */}
-            {displayRecipes.length > 0 ? (
-              <motion.div 
-                className="recipe-grid"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+          ) : error ? (
+            <div className="col-span-full text-center py-12 text-red-500">
+              {error}
+            </div>
+          ) : recipes.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              No recipes found matching your criteria.
+            </div>
+          ) : (
+            recipes.map(recipe => (
+              <div
+                key={recipe.id}
+                className="cursor-pointer"
+                onClick={() => handleRecipeClick(recipe.id)}
               >
-                {displayRecipes.map(recipe => (
-                  <motion.div 
-                    key={recipe.id} 
-                    variants={cardVariants}
-                    onClick={() => handleRecipeClick(recipe.id)} // Add click handler here
-                    className="cursor-pointer" // Add cursor pointer for better UX
-                  >
-                    <RecipeCard
-                      title={recipe.title}
-                      image={recipe.image}
-                      timeInMins={recipe.timeInMins}
-                      rating={recipe.rating}
-                      servings={recipe.servings}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <div 
-                className="empty-state"
-                style={{ backgroundColor: theme.core.container, color: theme.core.text }}
-              >
-                <div className="empty-emoji">🔍</div>
-                <h2 className="empty-heading">No Recipes Found</h2>
-                <p className="empty-message">We couldn't find any recipes that match your criteria.</p>
-                <button
-                  onClick={() => setFilters({
-                    query: '',
-                    minRating: 0,
-                    maxCookingTime: 180,
-                    cuisine: '',
-                    mealType: '',
-                    diet: '',
-                    mainIngredient: '',
-                    servings: ''
-                  })}
-                  className="empty-reset-button"
-                  style={{ 
-                    backgroundColor: theme.headerfooter.logoRed || "#c0392b",
-                    color: 'white'
-                  }}
-                >
-                  Reset Filters
-                </button>
+                <RecipeCard
+                  title={recipe.title}
+                  image={recipe.image}
+                  timeInMins={recipe.timeInMins}
+                  rating={recipe.rating}
+                  servings={recipe.servings}
+                />
               </div>
-            )}
-          </div>
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -22,7 +22,8 @@ const AnimatedFoodIcons = ({ count = 20 }) => {
         </div>
       ))}
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes float {
           0% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-20px) rotate(5deg); }
@@ -32,7 +33,17 @@ const AnimatedFoodIcons = ({ count = 20 }) => {
         .animate-float {
           animation: float 15s ease-in-out infinite;
         }
-      `}</style>
+
+        .food-icon {
+          position: absolute;
+          font-size: 24px;
+          animation-name: float;
+          animation-duration: 20s;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          z-index: 1;
+        }
+      `}} />
     </div>
   );
 };

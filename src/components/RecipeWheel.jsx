@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipeCard from './RecipeCard';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import AnimatedFoodIcons from './AnimatedFoodIcons';
+import { getAllRecipes } from '../services/ApiService';
 import './RecipeWheel.css'; // This now contains all our CSS
 
 // Memoized AnimatedFoodIconsBackground component to prevent re-renders
@@ -18,9 +19,7 @@ const AnimatedFoodIconsBackground = React.memo(({ count }) => {
 
 const RecipeWheel = () => {
   const { theme } = useTheme();
-  const { isLoggedIn, currentUser } = useAuth();
-  
-  // Navigation
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   
   // Refs
@@ -31,94 +30,62 @@ const RecipeWheel = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [showRecipe, setShowRecipe] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    cuisine: '',
-    mealType: '',
-    diet: '',
-    mainIngredient: ''
+    cuisine: 'Any',
+    mealType: 'Any',
+    diet: 'Any',
+    mainIngredient: 'Any'
   });
   
   // Dummy data for dropdowns
   const filterOptions = {
-    cuisine: ["Any", "Italian", "Mexican", "Chinese", "Indian", "Japanese", "American", "French", "Thai", "Mediterranean", "Turkish", "Korean"],
-    mealType: ["Any", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Appetizer", "Salad", "Soup", "Main Course", "Side Dish"],
-    diet: ["Any", "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Low-Carb", "Keto", "Paleo", "Pescatarian", "Halal", "Kosher"],
-    mainIngredient: ["Any", "Chicken", "Beef", "Pork", "Fish", "Shrimp", "Tofu", "Rice", "Pasta", "Potatoes", "Eggs", "Cheese", "Vegetables"]
+    cuisine: ["Any", "Turkish", "Italian", "Mexican", "Chinese", "Japanese", "Indian", 
+      "French", "Mediterranean", "American", "Thai", "Greek", "Korean",
+      "Middle Eastern", "Spanish", "Vietnamese", "Brazilian", "Other"],
+    
+    mealType: ["Any", "Breakfast", "Brunch", "Lunch", "Dinner", "Appetizer", "Soup", 
+      "Salad", "Main Course", "Side Dish", "Dessert", "Snack", "Beverage"],
+    
+    diet: ["Any", "Regular", "Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", 
+      "Low-Carb", "Keto", "Paleo", "Halal", "Kosher", "None"],
+    
+    mainIngredient: ["Any", "Beef", "Chicken", "Pork", "Lamb", "Fish", "Seafood",
+      "Eggs", "Tofu", "Beans", "Lentils",
+      "Rice", "Pasta", "Bread", "Potatoes",
+      "Vegetables", "Mushrooms", "Fruits",
+      "Other"]
   };
-  
-  // Dummy recipe data
-  const dummyRecipes = [
-    {
-      id: 1,
-      title: "Mediterranean Grilled Chicken Salad",
-      image: "/api/placeholder/400/300",
-      timeInMins: 35,
-      rating: 4.7,
-      servings: 2,
-    },
-    {
-      id: 2,
-      title: "Creamy Mushroom Risotto",
-      image: "/api/placeholder/400/300",
-      timeInMins: 45,
-      rating: 4.8,
-      servings: 4,
-    },
-    {
-      id: 3,
-      title: "Spicy Chocolate Brownies",
-      image: "/api/placeholder/400/300",
-      timeInMins: 40,
-      rating: 4.9,
-      servings: 12,
-    },
-    {
-      id: 4,
-      title: "Teriyaki Salmon Bowl",
-      image: "/api/placeholder/400/300",
-      timeInMins: 30,
-      rating: 4.6,
-      servings: 2,
-    },
-    {
-      id: 5,
-      title: "Classic Margherita Pizza",
-      image: "/api/placeholder/400/300",
-      timeInMins: 50,
-      rating: 4.5,
-      servings: 4,
-    },
-    {
-      id: 6,
-      title: "Vegetable Pad Thai",
-      image: "/api/placeholder/400/300",
-      timeInMins: 25,
-      rating: 4.4,
-      servings: 2,
-    }
-  ];
   
   // Handle input changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+    
+    // Reset errors when changing filters
+    setError(null);
+    
     setFilters(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    // Reset selected recipe and wheel when filters change
+    setShowRecipe(false);
+    setSelectedRecipe(null);
+    if (wheelRef.current) {
+      wheelRef.current.style.transition = 'none';
+      wheelRef.current.style.transform = 'rotate(0deg)';
+    }
   };
   
   // Handle wheel spin
-  const handleSpin = () => {
-    // Check if user is logged in
+  const handleSpin = async () => {
     if (!isLoggedIn) {
-      // Save current path for redirect after login
       localStorage.setItem('redirectPath', '/recipe-wheel');
-      // Redirect to login page
       navigate('/login');
       return;
     }
     
-    // Reset if already showing a recipe
     if (showRecipe) {
       setShowRecipe(false);
       setTimeout(() => {
@@ -127,50 +94,105 @@ const RecipeWheel = () => {
       return;
     }
     
-    spinWheel();
+    await spinWheel();
   };
   
-  const spinWheel = () => {
+  const spinWheel = async () => {
+    setError(null);
     setIsSpinning(true);
     
-    // Simulate wheel spinning with animation
     if (wheelRef.current) {
-      // Random number of rotations between 2 and 5
       const rotations = 2 + Math.random() * 3;
-      // Convert to degrees (360 degrees per rotation)
       const degrees = rotations * 360;
-      // Apply the rotation with CSS
       wheelRef.current.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
       wheelRef.current.style.transform = `rotate(${degrees}deg)`;
     }
     
-    // After 3 seconds, stop spinning and show a random recipe
-    setTimeout(() => {
-      setIsSpinning(false);
-      // Select a random recipe from dummyRecipes
-      const randomIndex = Math.floor(Math.random() * dummyRecipes.length);
-      setSelectedRecipe(dummyRecipes[randomIndex]);
-      setShowRecipe(true);
+    try {
+      // Get all recipes first
+      const allRecipes = await getAllRecipes();
       
-      // Give a small delay to ensure the recipe card is rendered before scrolling
-      setTimeout(() => {
-        if (recipeCardRef.current) {
-          recipeCardRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' // Center the element in the viewport
+      if (!allRecipes || allRecipes.length === 0) {
+        throw new Error('No recipes available');
+      }
+      
+      // Check if any actual filters are applied
+      const hasActiveFilters = Object.values(filters).some(value => value !== 'Any');
+      
+      // Apply filters client-side
+      let filteredRecipes = [...allRecipes];
+      
+      if (hasActiveFilters) {
+        // Apply each filter
+        if (filters.cuisine !== 'Any') {
+          filteredRecipes = filteredRecipes.filter(recipe => {
+            // Deep search for cuisine in multiple possible locations
+            if (!recipe) return false;
+            const recipeStr = JSON.stringify(recipe).toLowerCase();
+            return recipeStr.includes(filters.cuisine.toLowerCase());
           });
         }
-      }, 100);
-    }, 3000);
-  };
-  
-  // Reset wheel rotation when starting a new spin
-  useEffect(() => {
-    if (!isSpinning && !showRecipe && wheelRef.current) {
-      wheelRef.current.style.transition = 'none';
-      wheelRef.current.style.transform = 'rotate(0deg)';
+        
+        if (filters.mealType !== 'Any') {
+          filteredRecipes = filteredRecipes.filter(recipe => {
+            // Deep search for meal type
+            if (!recipe) return false;
+            const recipeStr = JSON.stringify(recipe).toLowerCase();
+            return recipeStr.includes(filters.mealType.toLowerCase());
+          });
+        }
+        
+        if (filters.diet !== 'Any') {
+          filteredRecipes = filteredRecipes.filter(recipe => {
+            // Deep search for diet
+            if (!recipe) return false;
+            const recipeStr = JSON.stringify(recipe).toLowerCase();
+            return recipeStr.includes(filters.diet.toLowerCase());
+          });
+        }
+        
+        if (filters.mainIngredient !== 'Any') {
+          filteredRecipes = filteredRecipes.filter(recipe => {
+            // Check ingredients
+            if (!recipe) return false;
+            const recipeStr = JSON.stringify(recipe).toLowerCase();
+            return recipeStr.includes(filters.mainIngredient.toLowerCase());
+          });
+        }
+      }
+      
+      // Wait for the wheel to finish spinning
+      setTimeout(() => {
+        setIsSpinning(false);
+        
+        if (filteredRecipes.length > 0) {
+          // Select a random recipe from filtered results
+          const randomIndex = Math.floor(Math.random() * filteredRecipes.length);
+          const matchingRecipe = filteredRecipes[randomIndex];
+          
+          setSelectedRecipe(matchingRecipe);
+          setShowRecipe(true);
+          
+          setTimeout(() => {
+            if (recipeCardRef.current) {
+              recipeCardRef.current.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center'
+              });
+            }
+          }, 100);
+        } else {
+          setError('No recipes match your filters. Would you like to add one?');
+        }
+      }, 3000);
+    } catch {
+      // Wait for wheel to finish spinning
+      setTimeout(() => {
+        setIsSpinning(false);
+        setError('No recipes match your filters. Would you like to add one?');
+      }, 3000);
     }
-  }, [isSpinning, showRecipe]);
+  };
   
   // Function to navigate to the recipe page
   const viewRecipeDetails = () => {
@@ -221,6 +243,7 @@ const RecipeWheel = () => {
                 onChange={handleFilterChange}
                 className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer"
                 style={{ backgroundColor: theme.core.containerHoover}}
+                disabled={isSpinning}
               >
                 {filterOptions.cuisine.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -237,6 +260,7 @@ const RecipeWheel = () => {
                 onChange={handleFilterChange}
                 className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer"
                 style={{ backgroundColor: theme.core.containerHoover}}
+                disabled={isSpinning}
               >
                 {filterOptions.mealType.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -253,6 +277,7 @@ const RecipeWheel = () => {
                 onChange={handleFilterChange}
                 className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer"
                 style={{ backgroundColor: theme.core.containerHoover}}
+                disabled={isSpinning}
               >
                 {filterOptions.diet.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -269,6 +294,7 @@ const RecipeWheel = () => {
                 onChange={handleFilterChange}
                 className="filter-select p-2 rounded-lg text-gray-900 cursor-pointer" 
                 style={{ backgroundColor: theme.core.containerHoover}}
+                disabled={isSpinning}
               >
                 {filterOptions.mainIngredient.map(option => (
                   <option key={option} value={option}>{option}</option>
@@ -277,20 +303,76 @@ const RecipeWheel = () => {
             </div>
           </div>
           
+          {/* Filter feedback */}
+          <div className="mt-3 text-center text-sm opacity-80">
+            {isSpinning ? (
+              "Finding your perfect recipe..."
+            ) : error ? (
+              <span style={{ color: theme.headerfooter.logoRed }}>{error}</span>
+            ) : (
+              "Set your preferences and spin the wheel!"
+            )}
+          </div>
+          
           {/* Spin button */}
           <div className="mt-6 flex justify-center">
             <button 
               onClick={handleSpin}
-              disabled={isSpinning}
+              disabled={isSpinning || !isLoggedIn}
               className={`flame-button cursor-pointer font-bold py-3 px-8 rounded-full text-lg ${!isSpinning && !showRecipe ? 'pulse' : ''}`}
               style={{ 
                 backgroundColor: theme.core.containerHoover,
                 color: theme.core.text,
+                opacity: (isSpinning || !isLoggedIn) ? 0.7 : 1,
+                cursor: (!isLoggedIn) ? 'not-allowed' : 'pointer'
               }}
             >
-              {showRecipe ? "Spin Again" : "Spin the Wheel"}
+              {isSpinning ? "Spinning..." : showRecipe ? "Spin Again" : "Spin the Wheel"}
             </button>
           </div>
+          
+          {/* Add Recipe Button */}
+          {error && error.includes('No recipes match') && (
+            <div className="mt-8 flex justify-center">
+              <div className="promotion-container relative p-6 rounded-xl border-4 border-dashed animate-pulse" 
+                   style={{ 
+                     borderColor: theme.headerfooter.logoRed,
+                     backgroundColor: 'rgba(255,255,255,0.1)',
+                     maxWidth: '90%',
+                     boxShadow: `0 8px 24px rgba(0,0,0,0.2), 0 0 16px ${theme.headerfooter.logoRed}40`
+                   }}>
+                <div className="flex flex-col items-center text-center">
+                  <div className="text-2xl font-bold mb-2" style={{ color: theme.headerfooter.logoRed }}>
+                    We Need Your Recipes!
+                  </div>
+                  <p className="mb-4">
+                    Help our community grow by adding your favorite {filters.cuisine !== 'Any' ? filters.cuisine : ''} 
+                    {filters.mealType !== 'Any' ? ' ' + filters.mealType : ''} 
+                    {filters.diet !== 'Any' ? ' ' + filters.diet : ''} 
+                    {filters.mainIngredient !== 'Any' ? ' with ' + filters.mainIngredient : ''} recipes.
+                  </p>
+                  <button 
+                    onClick={() => navigate('/add-recipe')}
+                    className="flame-button cursor-pointer font-bold py-3 px-8 rounded-full text-lg transform transition-transform duration-300 hover:scale-110"
+                    style={{ 
+                      backgroundColor: theme.headerfooter.logoRed,
+                      color: 'white',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                    }}
+                  >
+                    <span className="flex items-center">
+                      <span className="mr-2">+</span>
+                      Add Your Recipe
+                    </span>
+                  </button>
+                </div>
+                
+                {/* Decorative food emojis */}
+                <div className="absolute -top-5 -left-5 text-3xl">🍳</div>
+                <div className="absolute -bottom-5 -right-5 text-3xl">🥗</div>
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Wheel and Recipe Display */}
@@ -374,12 +456,13 @@ const RecipeWheel = () => {
       </div>
       
       {/* Add background pattern style */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .bg-pattern {
           background-image: radial-gradient(currentColor 1px, transparent 1px);
           background-size: 40px 40px;
         }
-      `}</style>
+      `}} />
     </div>
   );
 };
